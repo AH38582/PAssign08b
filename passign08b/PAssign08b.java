@@ -13,9 +13,9 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.geometry.Insets;
 
 /**
  * - Running window opens with the first scene, which is a class. Each ___Scene class has a confirm button that projects the next scene 
@@ -50,32 +50,61 @@ public class PAssign08b extends Application {
 	class CharacterNameScene extends HBox {
 
 		public CharacterNameScene(Stage stage, Character character) {
-			// Label, textfield input, confirn and back buttons
-			Label lblName = new Label("Name: ");
-			TextField tfName = new TextField();
+			// ---------- Set input and UI for Player Name------
+			Label lblPlayerName = new Label("Player Name: ");
+			TextField tfPlayerName = new TextField();
+			Label playerError = new Label();
+			VBox playerVbox = new VBox(tfPlayerName, playerError);
+			HBox playerHbox = new HBox(lblPlayerName, playerVbox);
+			
+			// ---------- set input and UI for Character Name ------
+			Label lblCharacterName = new Label("Character Name: ");
+			TextField tfCharacterName = new TextField();
+			Label characterError = new Label();
+			VBox characterVbox = new VBox(tfCharacterName, characterError);
+			HBox characterHbox = new HBox(lblCharacterName, characterVbox);
+
 			Button btnConfirm = new Button("Confirm");
-			Label error = new Label();
-
-			// VBox so error is placed directly below text field
-			VBox vbox = new VBox();
-			vbox.getChildren().addAll(tfName, error);
-
+			
+			//------ put spacing between items
+			setSpacing(10);
+			setPadding(new Insets(20));
+			
 			// getChildren();
-			getChildren().addAll(lblName, vbox, btnConfirm);
+			getChildren().addAll(playerHbox, characterHbox, btnConfirm);
 
 			btnConfirm.setOnAction(e -> { // -> CharacterClassScene
-				String name = tfName.getText().trim(); // takes trimmed input and store in variable
-
-				if (name.isEmpty()) { // error checks for empty textfield
-					error.setText("*Name cannot be blank");
+				// -------- clear the errors before checking
+				characterError.setText("");
+				playerError.setText("");
+				
+				// takes trimmed input and store in variable
+				String pName = tfPlayerName.getText().trim();
+				String charName = tfCharacterName.getText().trim();
+				
+				// -------- error checks for if the fields have text -----
+				if (pName.isEmpty() && charName.isEmpty()) { // error checks for empty textfield
+					playerError.setText("*Player Name cannot be blank");
+					characterError.setText("*Character Name cannot be blank");
+				} else if (pName.isEmpty()){
+					playerError.setText("*Name cannot be blank");
+				} else if (charName.isEmpty()) {
+					characterError.setText("*Name cannot be blank");
 				} else {
-					character.setName(name); // stores the character name in character class data field
-					stage.setScene(new Scene(new CharacterClassScene(stage, character), 600, 600)); // sets scene so window presents CharacterClssScene
+				character.setCharacterName(charName); // stores the character name in character class data field
+				character.setPlayerName(pName);
+				stage.setScene(new Scene(new CharacterClassScene(stage, character), 600, 600)); // sets scene so window presents CharacterClssScene
 				}
-			});
+				});
 
 			// Allows Enter key to also interact the same way as btnConfirm.setOneAction
-			tfName.setOnKeyPressed(e -> {
+			tfPlayerName.setOnKeyPressed(e -> {
+				if (e.getCode() == KeyCode.ENTER) {
+					btnConfirm.fire();
+				}
+			});
+			
+			tfCharacterName.setOnKeyPressed(e -> {
 				if (e.getCode() == KeyCode.ENTER) {
 					btnConfirm.fire();
 				}
@@ -280,7 +309,8 @@ public class PAssign08b extends Application {
 	class CharacterSheet extends VBox {
 		public CharacterSheet(Stage stage, Character character) {
 			// Labels for all updated information goes on sheet, and back and save buttons
-			Label name = new Label("Name: " + character.getName());
+			Label playerName = new Label("Player Name: " + character.getPlayerName());
+			Label characterName = new Label("CharacterName: " + character.getCharacterName());
 			Label classType = new Label("Class: " + character.getCharClass());
 			Label raceType = new Label("Race: " + character.getCharRace());
 			Label strength = new Label("Strength: " + character.getStrength());
@@ -297,12 +327,13 @@ public class PAssign08b extends Application {
 			HBox hbox = new HBox(btnBack, btnSave);
 			
 			// getChildren
-			getChildren().addAll(name, classType, raceType, strength, dexterity, constitution, intelligence, wisdom, charisma, hbox);
+			getChildren().addAll(playerName, characterName, classType, raceType, strength, dexterity, constitution, intelligence, wisdom, charisma, hbox);
 			
 			// see print() method
 			btnSave.setOnMouseClicked(e -> {
 				print(this, stage);
 			});
+			
 			
 			// back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
@@ -330,7 +361,8 @@ public class PAssign08b extends Application {
 
 	// Character class that stores character information
 	class Character {
-		private String name;
+		private String playerName;
+		private String characterName;
 		private CharacterClass charClass;
 		private CharacterRace charRace;
 		private int strength;
@@ -339,13 +371,21 @@ public class PAssign08b extends Application {
 		private int intelligence;
 		private int wisdom;
 		private int charisma;
-
-		public String getName() {
-			return name;
+		
+		public String getPlayerName() {
+			return playerName;
+		}
+		
+		public void setPlayerName(String playerName) {
+			this.playerName = playerName;			
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public String getCharacterName() {
+			return characterName;
+		}
+
+		public void setCharacterName(String name) {
+			this.characterName = name;
 		}
 
 		public CharacterClass getCharClass() {
@@ -522,5 +562,4 @@ public class PAssign08b extends Application {
 	}
 
 }
-// Test commit
 
