@@ -118,15 +118,15 @@ public class PAssign08b extends Application {
 	class CharacterClassScene extends HBox {
 		public CharacterClassScene(Stage stage, Character character) {
 			// All available CharacterClass subclasses, and confirm and back buttons
-			ClassOne classOne = new ClassOne();
-			ClassTwo classTwo = new ClassTwo();
+			Fighter fighter = new Fighter();
+			Mage mage = new Mage();
 			Button btnConfirm = new Button("Confirm");
 			Button btnBack = new Button("Back");
 
 			// radio button
 			ToggleGroup classGroup = new ToggleGroup();
-			RadioButton rbClassOne = new RadioButton(new ClassOne().getName());
-			RadioButton rbClassTwo = new RadioButton(new ClassTwo().getName());
+			RadioButton rbClassOne = new RadioButton("Fighter");
+			RadioButton rbClassTwo = new RadioButton("Mage");
 
 			// toggle group
 			rbClassOne.setToggleGroup(classGroup);
@@ -138,12 +138,12 @@ public class PAssign08b extends Application {
 			btnConfirm.setOnMouseClicked(e -> { /// -> CharacterRaceScene
 			// checks and saves the selected button with the selected class
 				if (rbClassOne.isSelected()) {
-					character.setCharClass(classOne);
+					character.setCharClass(fighter);
 					rbClassOne.setSelected(true);
 					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
 				} else if (rbClassTwo.isSelected()) {
 					rbClassTwo.setSelected(true);
-					character.setCharClass(classTwo);
+					character.setCharClass(mage);
 					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
 				}
 			});
@@ -456,23 +456,23 @@ public class PAssign08b extends Application {
 
 	// CharacterClass class that the Character class can use to set a class object
 	abstract class CharacterClass {
-		private String name;
+		private String className;
 
-		public CharacterClass(String name) {
-			setName(name);
+		public CharacterClass(String className) {
+			setClassName(className);
 		}
 
-		public String getName() {
-			return name;
+		public String getClassName() {
+			return className;
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public void setClassName(String className) {
+			this.className = className;
 		}
 
 		@Override
 		public String toString() {
-			return name;
+			return className;
 		}
 
 	}
@@ -545,18 +545,18 @@ public class PAssign08b extends Application {
 	
 
 	// placeholder subclasses of CharacterClass that will specify particular stats
-	class ClassOne extends CharacterClass {
+	class Fighter extends CharacterClass {
 
-		ClassOne() {
-			super("Class #1");
+		Fighter() {
+			super("Fighter");
 		}
 
 	}
 
-	class ClassTwo extends CharacterClass {
+	class Mage extends CharacterClass {
 
-		ClassTwo() {
-			super("Class #2");
+		Mage() {
+			super("Mage");
 		}
 
 	}
