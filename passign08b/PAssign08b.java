@@ -52,14 +52,14 @@ public class PAssign08b extends Application {
 		public CharacterNameScene(Stage stage, Character character) {
 			// ---------- Set input and UI for Player Name------
 			Label lblPlayerName = new Label("Player Name: ");
-			TextField tfPlayerName = new TextField();
+			TextField tfPlayerName = new TextField(character.getPlayerName());
 			Label playerError = new Label();
 			VBox playerVbox = new VBox(tfPlayerName, playerError);
 			HBox playerHbox = new HBox(lblPlayerName, playerVbox);
 			
 			// ---------- set input and UI for Character Name ------
 			Label lblCharacterName = new Label("Character Name: ");
-			TextField tfCharacterName = new TextField();
+			TextField tfCharacterName = new TextField(character.getCharacterName());
 			Label characterError = new Label();
 			VBox characterVbox = new VBox(tfCharacterName, characterError);
 			HBox characterHbox = new HBox(lblCharacterName, characterVbox);
@@ -540,9 +540,9 @@ public class PAssign08b extends Application {
 			character.setStrength(character.getStrength() + 1);
 			character.setWisdom(character.getWisdom() + 1);
 			character.setConstitution(character.getConstitution() + 1);
-
 		}
 	}
+	
 
 	// placeholder subclasses of CharacterClass that will specify particular stats
 	class ClassOne extends CharacterClass {
