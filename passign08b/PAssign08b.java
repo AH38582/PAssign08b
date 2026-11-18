@@ -397,7 +397,7 @@ public class PAssign08b extends Application {
 		private int wisdom;
 		private int charisma;
 		
-		Character(){
+		Character() {
 			setPlayerName("");
 			setCharacterName("");
 		}
@@ -612,4 +612,3 @@ public class PAssign08b extends Application {
 	}
 
 }
-
