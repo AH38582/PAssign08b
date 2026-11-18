@@ -246,66 +246,95 @@ public class PAssign08b extends Application {
 
 	// CharacterAbilityScene class that customizes scene and will project next scene when user presses "Confirm" button
 	class CharacterAbilityScene extends VBox {
+		private int availablePoints;
+		private Label lblPool = new Label("Available Attribute Points: " + availablePoints);
+				
 		// Private data fields that set initial text fields to "0" and arrow buttons
-		private TextField tfStrength = new TextField("0");
-		private TextField tfDexterity = new TextField("0");
-		private TextField tfConstitution = new TextField("0");
-		private TextField tfIntelligence = new TextField("0");
-		private TextField tfWisdom = new TextField("0");
-		private TextField tfCharisma = new TextField("0");
+		private TextField tfStrength = new TextField();
+		private TextField tfDexterity = new TextField();
+		private TextField tfConstitution = new TextField();
+		private TextField tfIntelligence = new TextField();
+		private TextField tfWisdom = new TextField();
+		private TextField tfCharisma = new TextField();
 		
-		private Label strength = new Label("Strength: ");
-		private Label dexterity = new Label("Dexterity: ");
-		private Label constitution = new Label("Constitution: ");
-		private Label intelligence = new Label("Intelligence: ");
-		private Label wisdom = new Label("Wisdom: ");
-		private Label charisma = new Label("Charisma:");
+//		private Label strength = new Label("Strength: ");
+//		private Label dexterity = new Label("Dexterity: ");
+//		private Label constitution = new Label("Constitution: ");
+//		private Label intelligence = new Label("Intelligence: ");
+//		private Label wisdom = new Label("Wisdom: ");
+//		private Label charisma = new Label("Charisma:");
 		
-		private Button leftStrength = new Button("◄");
-		private Button rightStrength = new Button("►");
-		private Button leftDexterity = new Button("◄");
-		private Button rightDexterity = new Button("►");
-		private Button leftConstitution = new Button("◄");
-		private Button rightConstitution = new Button("►");
-		private Button leftIntelligence = new Button("◄");
-		private Button rightIntelligence = new Button("►");
-		private Button leftWisdom = new Button("◄");
-		private Button rightWisdom = new Button("►");
-		private Button leftCharisma = new Button("◄");
-		private Button rightCharisma = new Button("►");
+//		private Button leftStrength = new Button("◄");
+//		private Button rightStrength = new Button("►");
+//		private Button leftDexterity = new Button("◄");
+//		private Button rightDexterity = new Button("►");
+//		private Button leftConstitution = new Button("◄");
+//		private Button rightConstitution = new Button("►");
+//		private Button leftIntelligence = new Button("◄");
+//		private Button rightIntelligence = new Button("►");
+//		private Button leftWisdom = new Button("◄");
+//		private Button rightWisdom = new Button("►");
+//		private Button leftCharisma = new Button("◄");
+//		private Button rightCharisma = new Button("►");
 		
 		public CharacterAbilityScene(Stage stage, Character character) {
-			// c=Confirm and back buttons
+			availablePoints = (80 - character.getStrength() - character.getDexterity() - character.getConstitution() - character.getIntelligence() - character.getWisdom() - character.getCharisma());
+			lblPool.setText("Available Attibute Points: " + availablePoints);
+			setSpacing(10);
+			setPadding(new Insets(20));
+			
+			// --------- Hbox Confirm and back buttons
 			Button btnBack = new Button("Back");
 			Button btnConfirm = new Button("Confirm");
+			HBox buttons = new HBox(10, btnConfirm, btnBack);
 			
-			// HBoxes for individual abilities and their buttons
-			HBox hStrength = new HBox(leftStrength, tfStrength, rightStrength);
-			HBox hDexterity = new HBox(leftDexterity, tfDexterity, rightDexterity);
-			HBox hConstitution = new HBox(leftConstitution, tfConstitution, rightConstitution);
-			HBox hIntelligence = new HBox(leftIntelligence, tfIntelligence, rightIntelligence);
-			HBox hWisdom = new HBox(leftWisdom, tfWisdom, rightWisdom);
-			HBox hCharisma = new HBox(leftCharisma, tfCharisma, rightCharisma);
-			HBox buttons = new HBox(btnConfirm, btnBack);
+			// -------- Set attribute fields based on character sheet ----
+			tfStrength.setText(String.valueOf(character.getStrength()));
+			tfDexterity.setText(String.valueOf(character.getDexterity()));
+			tfConstitution.setText(String.valueOf(character.getConstitution()));
+			tfIntelligence.setText(String.valueOf(character.getIntelligence()));
+			tfWisdom.setText(String.valueOf(character.getWisdom()));
+			tfCharisma.setText(String.valueOf(character.getCharisma()));
 			
-			// getChildren()
-			getChildren().addAll(strength, hStrength, dexterity, hDexterity, constitution, hConstitution, 
-					intelligence, hIntelligence, wisdom, hWisdom, charisma, hCharisma, buttons);
+//			// HBoxes for individual abilities and their buttons
+//			HBox hStrength = new HBox(leftStrength, tfStrength, rightStrength);
+//			HBox hDexterity = new HBox(leftDexterity, tfDexterity, rightDexterity);
+//			HBox hConstitution = new HBox(leftConstitution, tfConstitution, rightConstitution);
+//			HBox hIntelligence = new HBox(leftIntelligence, tfIntelligence, rightIntelligence);
+//			HBox hWisdom = new HBox(leftWisdom, tfWisdom, rightWisdom);
+//			HBox hCharisma = new HBox(leftCharisma, tfCharisma, rightCharisma);
+//			HBox buttons = new HBox(btnConfirm, btnBack);
+//			
+//			// getChildren()
+//			getChildren().addAll(strength, hStrength, dexterity, hDexterity, constitution, hConstitution, 
+//					intelligence, hIntelligence, wisdom, hWisdom, charisma, hCharisma, buttons);
 			
-			// Adjusts left and right buttons to any desired number within range(assuming there is a range)
-			leftStrength.setOnMouseClicked(e -> leftButtonCondition(tfStrength));
-			leftDexterity.setOnMouseClicked(e -> leftButtonCondition(tfDexterity));
-			leftConstitution.setOnMouseClicked(e -> leftButtonCondition(tfConstitution));
-			leftIntelligence.setOnMouseClicked(e -> leftButtonCondition(tfIntelligence));
-			leftWisdom.setOnMouseClicked(e -> leftButtonCondition(tfWisdom));
-			leftCharisma.setOnMouseClicked(e -> leftButtonCondition(tfCharisma));
-			
-			rightStrength.setOnMouseClicked(e -> rightButtonCondition(tfStrength));
-			rightDexterity.setOnMouseClicked(e -> rightButtonCondition(tfDexterity));
-			rightConstitution.setOnMouseClicked(e -> rightButtonCondition(tfConstitution));
-			rightIntelligence.setOnMouseClicked(e -> rightButtonCondition(tfIntelligence));
-			rightWisdom.setOnMouseClicked(e -> rightButtonCondition(tfWisdom));
-			rightCharisma.setOnMouseClicked(e -> rightButtonCondition(tfCharisma));
+			// ---------- add items to VBox using new method
+			getChildren().addAll(
+					lblPool,
+					createStatRow("STR: ", tfStrength),
+					createStatRow("DEX: ", tfDexterity),
+					createStatRow("CON: ", tfConstitution),
+					createStatRow("INT: ", tfIntelligence),
+					createStatRow("WIS: ", tfWisdom),
+					createStatRow("CHA: ", tfCharisma),
+					buttons
+					
+			);
+//			// Adjusts left and right buttons to any desired number within range(assuming there is a range)
+//			leftStrength.setOnMouseClicked(e -> leftButtonCondition(tfStrength));
+//			leftDexterity.setOnMouseClicked(e -> leftButtonCondition(tfDexterity));
+//			leftConstitution.setOnMouseClicked(e -> leftButtonCondition(tfConstitution));
+//			leftIntelligence.setOnMouseClicked(e -> leftButtonCondition(tfIntelligence));
+//			leftWisdom.setOnMouseClicked(e -> leftButtonCondition(tfWisdom));
+//			leftCharisma.setOnMouseClicked(e -> leftButtonCondition(tfCharisma));
+//			
+//			rightStrength.setOnMouseClicked(e -> rightButtonCondition(tfStrength));
+//			rightDexterity.setOnMouseClicked(e -> rightButtonCondition(tfDexterity));
+//			rightConstitution.setOnMouseClicked(e -> rightButtonCondition(tfConstitution));
+//			rightIntelligence.setOnMouseClicked(e -> rightButtonCondition(tfIntelligence));
+//			rightWisdom.setOnMouseClicked(e -> rightButtonCondition(tfWisdom));
+//			rightCharisma.setOnMouseClicked(e -> rightButtonCondition(tfCharisma));
 			
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterSheet
 				saveAbilities(character);
@@ -316,16 +345,39 @@ public class PAssign08b extends Application {
 			btnBack.setOnMouseClicked(e -> {
 				stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
 			});
-			
-			// sets text to previous inputs when user returns to this scene
-			tfStrength.setText(String.valueOf(character.getStrength()));
-			tfDexterity.setText(String.valueOf(character.getDexterity()));
-			tfConstitution.setText(String.valueOf(character.getConstitution()));
-			tfIntelligence.setText(String.valueOf(character.getIntelligence()));
-			tfWisdom.setText(String.valueOf(character.getWisdom()));
-			tfCharisma.setText(String.valueOf(character.getCharisma()));
-			
+						
 		}
+		
+		private HBox createStatRow(String labelText, TextField tf) {
+			tf.setEditable(false);
+			tf.setPrefWidth(50);
+			
+			Button btnLeft = new Button("◄");
+			Button btnRight = new Button("►");
+			
+			btnLeft.setOnMouseClicked(e -> modifyStat(tf, -1));
+			btnRight.setOnMouseClicked(e -> modifyStat(tf, 1));
+			
+			return new HBox(10, new Label(labelText), btnLeft, tf, btnRight);
+		}
+		
+		public void modifyStat(TextField textField, int delta) {
+			int currentVal = Integer.parseInt(textField.getText());
+			int newVal = currentVal + delta;
+			
+			if (newVal >= 6 && newVal <= 18) {
+				if (delta > 0 && availablePoints > 0) {
+					textField.setText(String.valueOf(newVal));
+					availablePoints--;
+					lblPool.setText("Available Attribute Points: " + availablePoints);	
+				} else if (delta < 0) {
+					textField.setText(String.valueOf(newVal));
+					availablePoints++;
+					lblPool.setText("Available Attribute Points: " + availablePoints);
+				}
+			}
+		}
+		
 		
 		// method that saves the ability inputs and stores them into character data fields
 		public void saveAbilities(Character character) {
@@ -338,23 +390,7 @@ public class PAssign08b extends Application {
 			character.getCharRace().applyStats(character);
 		}
 		
-		// method that conditions the floor for left button (assuming there is a floor)
-		public void leftButtonCondition(TextField textField) {
-			int num = Integer.parseInt(textField.getText());
-			
-			if (num > 0) {
-				textField.setText(String.format("%d", num - 1));
-			} 
-		}
 		
-		// method that conditions the ceiling for right button (assuming there is a ceiling)
-		public void rightButtonCondition(TextField textField) {
-			int num = Integer.parseInt(textField.getText());
-
-			if (num < 20) {
-				textField.setText(String.format("%d", num + 1));
-			}
-		}
 	}
 
 	// CharacterSheet class that will show all of the collected data for the user to view
@@ -427,6 +463,12 @@ public class PAssign08b extends Application {
 		Character() {
 			setPlayerName("");
 			setCharacterName("");
+			setStrength(10);
+			setDexterity(10);
+			setConstitution(10);
+			setIntelligence(10);
+			setWisdom(10);
+			setCharisma(10);
 		}
 		
 		public String getPlayerName() {
