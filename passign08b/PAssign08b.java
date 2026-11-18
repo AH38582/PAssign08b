@@ -372,6 +372,11 @@ public class PAssign08b extends Application {
 		private int wisdom;
 		private int charisma;
 		
+		Character() {
+			setPlayerName("");
+			setCharacterName("");
+		}
+		
 		public String getPlayerName() {
 			return playerName;
 		}
@@ -562,4 +567,3 @@ public class PAssign08b extends Application {
 	}
 
 }
-
