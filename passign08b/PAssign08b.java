@@ -115,35 +115,60 @@ public class PAssign08b extends Application {
 	}
 
 	// CharacterClassScene class that customizes scene and will project next scene when user presses "Confirm" button
-	class CharacterClassScene extends HBox {
+	class CharacterClassScene extends VBox {
 		public CharacterClassScene(Stage stage, Character character) {
-			// All available CharacterClass subclasses, and confirm and back buttons
+			setSpacing(15);
+			setPadding(new Insets(20));
+			
+			// ------------  Generate class instances
 			Fighter fighter = new Fighter();
 			Mage mage = new Mage();
+			Cleric cleric = new Cleric();
+			
+			Label lblTitle = new Label("Choose Your Class");
+			
+			// ------- radio buttons
+			ToggleGroup classGroup = new ToggleGroup();
+			RadioButton rbFighter = new RadioButton(fighter.getClassName());
+			RadioButton rbMage = new RadioButton(mage.getClassName());
+			RadioButton rbCleric = new RadioButton(cleric.getClassName());
+
+			rbFighter.setToggleGroup(classGroup);
+			rbMage.setToggleGroup(classGroup);
+			rbCleric.setToggleGroup(classGroup);
+			
+			HBox classHbox = new HBox();
+			classHbox.setSpacing(15);
+			classHbox.getChildren().addAll(rbFighter, rbMage, rbCleric);
+			
+			// -------------  Description Label that will be the block of text in open space
+			Label lblDescription = new Label("Select a class above to read its desctription");
+			lblDescription.setWrapText(true);
+			lblDescription.setStyle("-fx-font-style: italic; -fx-padding: 10px");
+			
+			rbFighter.setOnAction(e -> lblDescription.setText(fighter.getClassDescription()));
+			rbMage.setOnAction(e -> lblDescription.setText(mage.getClassDescription()));
+			rbCleric.setOnAction(e -> lblDescription.setText(cleric.getClassDescription()));
+			
 			Button btnConfirm = new Button("Confirm");
 			Button btnBack = new Button("Back");
 
-			// radio button
-			ToggleGroup classGroup = new ToggleGroup();
-			RadioButton rbClassOne = new RadioButton("Fighter");
-			RadioButton rbClassTwo = new RadioButton("Mage");
-
-			// toggle group
-			rbClassOne.setToggleGroup(classGroup);
-			rbClassTwo.setToggleGroup(classGroup);
-			
 			// getChildren()
-			getChildren().addAll(rbClassOne, rbClassTwo, btnConfirm, btnBack);
+			getChildren().addAll(lblTitle, classHbox, lblDescription, btnConfirm, btnBack);
 			
 			btnConfirm.setOnMouseClicked(e -> { /// -> CharacterRaceScene
 			// checks and saves the selected button with the selected class
-				if (rbClassOne.isSelected()) {
+				if (rbFighter.isSelected()) {
 					character.setCharClass(fighter);
-					rbClassOne.setSelected(true);
+					rbFighter.setSelected(true);
 					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
-				} else if (rbClassTwo.isSelected()) {
-					rbClassTwo.setSelected(true);
+				} else if (rbMage.isSelected()) {
+					rbMage.setSelected(true);
 					character.setCharClass(mage);
+					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
+				} else if (rbCleric.isSelected()) {
+					rbCleric.setSelected(true);
+					character.setCharClass(cleric);
 					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
 				}
 			});
@@ -372,6 +397,11 @@ public class PAssign08b extends Application {
 		private int wisdom;
 		private int charisma;
 		
+		Character(){
+			setPlayerName("");
+			setCharacterName("");
+		}
+		
 		public String getPlayerName() {
 			return playerName;
 		}
@@ -546,19 +576,39 @@ public class PAssign08b extends Application {
 
 	// placeholder subclasses of CharacterClass that will specify particular stats
 	class Fighter extends CharacterClass {
-
+		private String classDescription = "Fighters are trained warriors who rely on skill, strength, and weapons rather than magic to win battles. They can use almost any weapon or armor, making them versatile frontline soldiers who can both take heavy hits and dish out fast, deadly attacks.";
+		
 		Fighter() {
 			super("Fighter");
 		}
-
+		
+		public String getClassDescription() {
+			return classDescription;
+		}
 	}
 
 	class Mage extends CharacterClass {
+		private String classDescription = "Mages are scholars and spellcasters who study the arcane arts to bend reality to their will. Though physically fragile and unable to wear heavy armor, they stay in the backlines to unleash devastating elemental magic, summon creatures, and control the battlefield with powerful spells.";
 
 		Mage() {
 			super("Mage");
 		}
-
+		
+		public String getClassDescription() {
+			return classDescription;
+		}
+	}
+	
+	class Cleric extends CharacterClass{
+		private String classDescription =  "Clerics are devout warriors who channel divine magic granted by the gods they serve. Wearing medium or heavy armor, they stand near the frontlines to heal wounded allies, banish undead monsters, and smite enemies with sacred power.";
+		
+		Cleric() {
+			super("Cleric");
+		}
+		
+		public String getClassDescription() {
+			return classDescription;
+		}
 	}
 
 }
