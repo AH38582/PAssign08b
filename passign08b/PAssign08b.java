@@ -182,21 +182,48 @@ public class PAssign08b extends Application {
 	}
 
 	// CharacterRaceScene class that customizes scene and will project next scene when user presses "Confirm" button
-	class CharacterRaceScene extends HBox {
+	class CharacterRaceScene extends VBox {
 		public CharacterRaceScene(Stage stage, Character character) {
-			// All available CharacterRace subclasses, and confirm and back buttons
-			RaceOne raceOne = new RaceOne();
-			RaceTwo raceTwo = new RaceTwo();
-			Button btnConfirm = new Button("Confirm");
-			Button btnBack = new Button("Back");
+			setSpacing(15);
+			setPadding(new Insets(20));
+			
+			Label lblTitle = new Label("Choose your Race:");
+			
+			// All available CharacterRace subclasses
+			RaceHuman human = new RaceHuman();
+			RaceElf elf = new RaceElf();
+			RaceDwarf dwarf = new RaceDwarf();
+			RaceHalfElf halfElf = new RaceHalfElf();
+			RaceHalfOrc halfOrc = new RaceHalfOrc();
 
 			// combo-box
 			ComboBox<CharacterRace> cbRace = new ComboBox<CharacterRace>();
-			cbRace.getItems().addAll(raceOne, raceTwo);
+			cbRace.getItems().addAll(human, elf, dwarf, halfElf, halfOrc);
 			cbRace.setPromptText("Choose a race: ");
+			
+			// --------- Race Description Label to describe selection
+			Label lblRaceName = new Label("");
+			lblRaceName.setStyle("-fx-font-style: bold; -fx-padding: 5px; -fx-font-size: 30px");			
+			Label lblDescription = new Label("Select race above to read its description");
+			lblDescription.setWrapText(true);
+			lblDescription.setStyle("-fx-font-style: italic; -fx-padding: 5px");
+			
+			// ------ update the race description with what is selected from comboBox
+			
+			cbRace.setOnAction(e -> {
+				CharacterRace selected = cbRace.getValue();
+				if (selected != null) {
+					lblRaceName.setText(selected.getRaceName());
+					lblDescription.setText(selected.getRaceDescription());
+				}
+			});
+
+			Button btnConfirm = new Button("Confirm");
+			Button btnBack = new Button("Back");
+			HBox buttons = new HBox(10, btnConfirm, btnBack);
 
 			// getChildren()
-			getChildren().addAll(cbRace, btnConfirm, btnBack);
+			getChildren().addAll(lblTitle, cbRace, lblRaceName, lblDescription, buttons);
 
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterAbilityScene
 				CharacterRace selectedRace = cbRace.getValue();
@@ -507,73 +534,6 @@ public class PAssign08b extends Application {
 
 	}
 
-	// CharacterRace class that the Character class can use to set a race object
-	abstract class CharacterRace {
-		private String name;
-
-		public CharacterRace(String name) {
-			setName(name);
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public void applyStats(Character character) {
-			character.setDexterity(character.getDexterity());
-			character.setCharisma(character.getCharisma());
-			character.setIntelligence(character.getIntelligence());
-			character.setStrength(character.getStrength());
-			character.setWisdom(character.getWisdom());
-			character.setConstitution(character.getConstitution());
-		}
-
-		@Override
-		public String toString() {
-			return name;
-		}
-	}
-
-	// placeholder subclasses of CharacterRace that will specify particular stats
-	class RaceOne extends CharacterRace {
-		RaceOne() {
-			super("Race #1");
-
-		}
-
-		@Override
-		public void applyStats(Character character) {
-			character.setDexterity(character.getDexterity());
-			character.setCharisma(character.getCharisma());
-			character.setIntelligence(character.getIntelligence());
-			character.setStrength(character.getStrength());
-			character.setWisdom(character.getWisdom());
-			character.setConstitution(character.getConstitution());
-
-		}
-	}
-
-	class RaceTwo extends CharacterRace { // placeholder subclass with fixed ability score increase
-		RaceTwo() {
-			super("Race #2");
-		}
-
-		@Override
-		public void applyStats(Character character) {
-			character.setDexterity(character.getDexterity() + 1);
-			character.setCharisma(character.getCharisma() + 1);
-			character.setIntelligence(character.getIntelligence() + 1);
-			character.setStrength(character.getStrength() + 1);
-			character.setWisdom(character.getWisdom() + 1);
-			character.setConstitution(character.getConstitution() + 1);
-		}
-	}
-	
-
 	// placeholder subclasses of CharacterClass that will specify particular stats
 	class Fighter extends CharacterClass {
 		private String classDescription = "Fighters are trained warriors who rely on skill, strength, and weapons rather than magic to win battles. They can use almost any weapon or armor, making them versatile frontline soldiers who can both take heavy hits and dish out fast, deadly attacks.";
@@ -586,10 +546,10 @@ public class PAssign08b extends Application {
 			return classDescription;
 		}
 	}
-
+	
 	class Mage extends CharacterClass {
 		private String classDescription = "Mages are scholars and spellcasters who study the arcane arts to bend reality to their will. Though physically fragile and unable to wear heavy armor, they stay in the backlines to unleash devastating elemental magic, summon creatures, and control the battlefield with powerful spells.";
-
+		
 		Mage() {
 			super("Mage");
 		}
@@ -600,6 +560,7 @@ public class PAssign08b extends Application {
 	}
 	
 	class Cleric extends CharacterClass{
+		
 		private String classDescription =  "Clerics are devout warriors who channel divine magic granted by the gods they serve. Wearing medium or heavy armor, they stand near the frontlines to heal wounded allies, banish undead monsters, and smite enemies with sacred power.";
 		
 		Cleric() {
@@ -608,6 +569,109 @@ public class PAssign08b extends Application {
 		
 		public String getClassDescription() {
 			return classDescription;
+		}
+	}
+	
+	
+	// CharacterRace class that the Character class can use to set a race object
+	abstract class CharacterRace {
+		private String raceName;
+		private String raceDescription;
+
+		public CharacterRace(String raceName) {
+			setRaceName(raceName);
+		}
+
+		public String getRaceName() {
+			return raceName;
+		}
+
+		public void setRaceName(String raceName) {
+			this.raceName = raceName;
+		}
+		
+		public String getRaceDescription() {
+			return raceDescription;
+		}
+		
+		public void setRaceDescription(String raceDescription) {
+			this.raceDescription = raceDescription;
+		}
+
+		abstract void applyStats(Character character);
+
+		@Override
+		public String toString() {
+			return raceName;
+		}
+	}
+
+	// placeholder subclasses of CharacterRace that will specify particular stats
+	class RaceHuman extends CharacterRace {
+		RaceHuman() {
+			super("Human");
+			setRaceDescription("Humans are the most adaptable and ambitious of the common races. Though their lifespans are relatively short, they make up for it with endless drive, curiosity, and versatility, allowing them to excel in almost any role, build sprawling empires, and quickly adjust to changing times.");
+		}
+
+		@Override
+		public void applyStats(Character character) {
+			character.setCharisma(character.getCharisma() + 1);
+			character.setConstitution(character.getConstitution() + 1);
+
+		}
+	}
+
+	class RaceElf extends CharacterRace { // placeholder subclass with fixed ability score increase
+		RaceElf() {
+			super("Elf");
+			setRaceDescription("Elves are graceful, long-lived beings with a deep connection to nature and the arcane arts. Known for their keen senses, slender builds, and unmatched agility, they spend centuries perfecting their crafts, magic, and martial skills while maintaining an aloof, timeless perspective on the world.");
+		}
+
+		@Override
+		public void applyStats(Character character) {
+			character.setDexterity(character.getDexterity() + 1);
+			character.setIntelligence(character.getIntelligence() + 1);
+		}
+	}
+	
+	class RaceDwarf extends CharacterRace {
+		RaceDwarf() {
+			super("Dwarf");
+			setRaceDescription("Dwarves are stout, rugged folk known for their resilience, loyalty, and unmatched skill in mining, stonework, and metalcraft. Living deep within mountain strongholds, they are fierce, stubborn warriors who value honor, tradition, and the forging of legendary weapons and armor.");
+		}
+
+		@Override
+		public void applyStats(Character character) {
+			character.setWisdom(character.getWisdom() + 1);
+			character.setConstitution(character.getConstitution() + 1);
+
+		}
+	}
+	
+	class RaceHalfElf extends CharacterRace {
+		RaceHalfElf() {
+			super("Half-Elf");
+			setRaceDescription("Half-elves blend the best traits of their dual heritage, combining human ambition and adaptability with elven grace and keen senses. Often walking between two worlds without fully belonging to either, they tend to be charismatic, natural diplomats and travelers who easily charm others and thrive in diverse company.");
+		}
+
+		@Override
+		public void applyStats(Character character) {
+			character.setCharisma(character.getCharisma() + 1);
+			character.setIntelligence(character.getIntelligence() + 1);
+		}
+	}
+	
+	class RaceHalfOrc extends CharacterRace {
+		RaceHalfOrc() {
+			super("Half-Orc");
+			setRaceDescription("Half-orcs combine human ingenuity with the towering stature and raw physical strength of their orcish ancestry. Often viewed with suspicion by civilized societies, they possess fierce endurance and an unstoppable drive, making them intimidating, relentless warriors who rely on sheer grit and power to survive.");
+		}
+
+		@Override
+		public void applyStats(Character character) {
+			character.setCharisma(character.getCharisma() -1);
+			character.setStrength(character.getStrength() + 2);
+			character.setConstitution(character.getConstitution() + 1);
 		}
 	}
 
