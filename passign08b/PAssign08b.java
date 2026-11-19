@@ -1,5 +1,5 @@
 package passign08b;
- 
+
 import javafx.application.Application;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
@@ -8,14 +8,24 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 
 /**
  * - Running window opens with the first scene, which is a class. Each ___Scene class has a confirm button that projects the next scene 
@@ -25,7 +35,17 @@ import javafx.stage.Window;
  */
 
 public class PAssign08b extends Application {
-
+	private BorderPane root = new BorderPane();
+	
+	// ----- Method that sets nodes in center and the tracker at the bottom
+	private void showScene(Node content, int page) {
+		root.setCenter(content);
+		HBox trackerBox = new HBox(new CharacterCreationTracker(page));
+		trackerBox.setAlignment(Pos.CENTER);
+		trackerBox.setPadding(new Insets(0, 0, 10, 0));
+		root.setBottom(new VBox(10, new Separator(), trackerBox));
+	}
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -38,125 +58,308 @@ public class PAssign08b extends Application {
 		// Create CharacterNameScene
 		CharacterNameScene characterScene = new CharacterNameScene(stage, character);
 
-		// Set first scene here and CharacterScene class will hold action event for next
-		// scene
-		Scene scene = new Scene(characterScene, 600, 600);
+		// Set first scene here and CharacterScene class will hold action event for next scene
+		Scene scene = new Scene(root, 800, 350);
+		showScene(new CharacterNameScene(stage, character), 1);
+		
+		// prioritizes focus to be on entire node (to prevent cursor from automatically setting into text field)
+		characterScene.setFocusTraversable(true);
+		characterScene.requestFocus();
 		stage.setScene(scene);
 		stage.show();
 
 	}
 
 	// CharacterNameScene class that customizes scene and will project next scene when user presses "Confirm" button
-	class CharacterNameScene extends HBox {
+	class CharacterNameScene extends VBox {
 
 		public CharacterNameScene(Stage stage, Character character) {
-			// Label, textfield input, confirn and back buttons
-			Label lblName = new Label("Name: ");
-			TextField tfName = new TextField();
+			// ---- All containers in order to go in VBox
+			VBox headingBox = new VBox();
+			Separator seperatorTop = new Separator(); // Divider line
+			GridPane gridBox = new GridPane();
+			
+			setMargin(seperatorTop, new Insets(-10, 0, 0, 0));
+			
+			getChildren().addAll(headingBox, seperatorTop, gridBox);
+			
+			// ----- Header Container Setup
+			Label heading = new Label("Create Your Character");
+			heading.setStyle("-fx-font-size: 24px; -fx-fontweight: bold;");
+			Label subtitle = new Label("Enter your player and character name below.");
+			
+			VBox headerColumn = new VBox(5, heading, subtitle);
+			headerColumn.setAlignment(Pos.CENTER_LEFT);
+			
 			Button btnConfirm = new Button("Confirm");
-			Label error = new Label();
-
-			// VBox so error is placed directly below text field
-			VBox vbox = new VBox();
-			vbox.getChildren().addAll(tfName, error);
-
-			// getChildren();
-			getChildren().addAll(lblName, vbox, btnConfirm);
-
+			
+			HBox headerRow = new HBox(20);
+			headerRow.setAlignment(Pos.CENTER_LEFT);
+			HBox.setMargin(btnConfirm, new Insets(35, 0, 0, 0));
+			
+			Region spacer = new Region(); // Makes space between labels and button
+			HBox.setHgrow(spacer, Priority.ALWAYS);
+			
+			headerRow.getChildren().addAll(headerColumn, spacer, btnConfirm);
+			headingBox.getChildren().add(headerRow);
+			headingBox.setAlignment(Pos.CENTER_LEFT);
+			
+			// ----- GridPane Container Setup
+			
+			// ---------- Set input and UI for Player Name------
+			Label lblPlayerName = new Label("Player Name: ");
+			TextField tfPlayerName = new TextField(character.getPlayerName());
+			tfPlayerName.setPromptText("Enter Player Name...");
+			tfPlayerName.setPrefWidth(630);
+			Label playerError = new Label();
+			playerError.setStyle("-fx-text-fill: #eb4034;");
+			VBox playerVbox = new VBox(tfPlayerName, playerError);
+			
+			// ---------- set input and UI for Character Name ------
+			Label lblCharacterName = new Label("Character Name: ");
+			TextField tfCharacterName = new TextField(character.getCharacterName());
+			tfCharacterName.setPromptText("Enter Character Name...");
+			Label characterError = new Label();
+			characterError.setStyle("-fx-text-fill: #eb4034;");
+			VBox characterVbox = new VBox(tfCharacterName, characterError);
+			
+			gridBox.setHgap(15);
+			gridBox.setVgap(10);
+			gridBox.add(lblPlayerName, 0, 0);
+			gridBox.add(playerVbox, 1, 0);
+			gridBox.add(lblCharacterName, 0, 1);
+			gridBox.add(characterVbox, 1, 1);
+			GridPane.setMargin(playerVbox, new Insets(22, 0, 0, 0));
+			GridPane.setMargin(characterVbox, new Insets(22, 0, 0, 0));
+			
+			//------ put spacing between items
+			setSpacing(15);
+			setPadding(new Insets(30));
+			setAlignment(Pos.CENTER);
+			
 			btnConfirm.setOnAction(e -> { // -> CharacterClassScene
-				String name = tfName.getText().trim(); // takes trimmed input and store in variable
+				// -------- clear the errors before checking
+				characterError.setText("");
+				playerError.setText("");
 
-				if (name.isEmpty()) { // error checks for empty textfield
-					error.setText("*Name cannot be blank");
+				// takes trimmed input and store in variable
+				String pName = tfPlayerName.getText().trim();
+				String charName = tfCharacterName.getText().trim();
+
+				// -------- error checks for if the fields have text -----
+				if (pName.isEmpty() && charName.isEmpty()) { // error checks for empty textfield
+					playerError.setText("*Player Name cannot be blank.");
+					characterError.setText("*Character Name cannot be blank.");
+				} else if (pName.isEmpty()) {
+					playerError.setText("*Player cannot be blank.");
+				} else if (charName.isEmpty()) {
+					characterError.setText("*Character cannot be blank.");
 				} else {
-					character.setName(name); // stores the character name in character class data field
-					stage.setScene(new Scene(new CharacterClassScene(stage, character), 600, 600)); // sets scene so window presents CharacterClssScene
+					character.setCharacterName(charName); // stores the character name in character class data field
+					character.setPlayerName(pName);
+					showScene(new CharacterClassScene(stage, character), 2); // sets scene so window presents CharacterClssScene
 				}
 			});
 
 			// Allows Enter key to also interact the same way as btnConfirm.setOneAction
-			tfName.setOnKeyPressed(e -> {
+			tfPlayerName.setOnKeyPressed(e -> {
 				if (e.getCode() == KeyCode.ENTER) {
 					btnConfirm.fire();
 				}
 			});
-
+			
+			tfCharacterName.setOnKeyPressed(e -> {
+				if (e.getCode() == KeyCode.ENTER) {
+					btnConfirm.fire();
+				}
+			});
+			
 		}
 
 	}
 
 	// CharacterClassScene class that customizes scene and will project next scene when user presses "Confirm" button
-	class CharacterClassScene extends HBox {
+	class CharacterClassScene extends VBox {
 		public CharacterClassScene(Stage stage, Character character) {
-			// All available CharacterClass subclasses, and confirm and back buttons
-			ClassOne classOne = new ClassOne();
-			ClassTwo classTwo = new ClassTwo();
+			// ---- All containers in order to go in VBox
+			VBox headerContainer = new VBox();
+			Separator seperatorTop = new Separator(); // Divider line
+			VBox bodyContainer = new VBox();
+			
+			setMargin(seperatorTop, new Insets(-10, 0, 0, 0));
+			getChildren().addAll(headerContainer, seperatorTop, bodyContainer);
+			setSpacing(15);
+			setPadding(new Insets(20));
+			
+			// ----- Header Container Setup
+			Label heading = new Label("Choose Your Class");
+			heading.setStyle("-fx-font-size: 24px; -fx-fontweight: bold;");
+			Label subtitle = new Label("Select a class below to read its description.");
+
+			VBox headerColumn = new VBox(5, heading, subtitle);
+			headerColumn.setAlignment(Pos.CENTER_LEFT);
+
 			Button btnConfirm = new Button("Confirm");
 			Button btnBack = new Button("Back");
 
-			// radio button
-			ToggleGroup classGroup = new ToggleGroup();
-			RadioButton rbClassOne = new RadioButton(new ClassOne().getName());
-			RadioButton rbClassTwo = new RadioButton(new ClassTwo().getName());
+			HBox headerRow = new HBox(20);
+			headerRow.setAlignment(Pos.CENTER_LEFT);
+			HBox.setMargin(btnConfirm, new Insets(35, 0, 0, 0));
+			HBox.setMargin(btnBack, new Insets(35, 0, 0, -10));
 
-			// toggle group
-			rbClassOne.setToggleGroup(classGroup);
-			rbClassTwo.setToggleGroup(classGroup);
+			Region spacer = new Region(); // Makes space between labels and button
+			HBox.setHgrow(spacer, Priority.ALWAYS);
+
+			headerRow.getChildren().addAll(headerColumn, spacer, btnConfirm, btnBack);
+			headerContainer.getChildren().add(headerRow);
+			headerContainer.setAlignment(Pos.CENTER_LEFT);
 			
-			// getChildren()
-			getChildren().addAll(rbClassOne, rbClassTwo, btnConfirm, btnBack);
+			// ------------  Generate class instances
+			Fighter fighter = new Fighter();
+			Mage mage = new Mage();
+			Cleric cleric = new Cleric();
 			
-			btnConfirm.setOnMouseClicked(e -> { /// -> CharacterRaceScene
-			// checks and saves the selected button with the selected class
-				if (rbClassOne.isSelected()) {
-					character.setCharClass(classOne);
-					rbClassOne.setSelected(true);
-					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
-				} else if (rbClassTwo.isSelected()) {
-					rbClassTwo.setSelected(true);
-					character.setCharClass(classTwo);
-					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
+			// ------- radio buttons
+			ToggleGroup classGroup = new ToggleGroup();
+			RadioButton rbFighter = new RadioButton(fighter.getClassName());
+			RadioButton rbMage = new RadioButton(mage.getClassName());
+			RadioButton rbCleric = new RadioButton(cleric.getClassName());
+
+			rbFighter.setToggleGroup(classGroup);
+			rbMage.setToggleGroup(classGroup);
+			rbCleric.setToggleGroup(classGroup);
+			
+			// // ----- Body Container Setup
+			HBox classHbox = new HBox();
+			classHbox.setSpacing(25);
+			classHbox.setAlignment(Pos.CENTER_LEFT);
+			classHbox.getChildren().addAll(rbFighter, rbMage, rbCleric);
+			
+			// -------------  Description Label that will be the block of text in open space
+			Label lblDescription = new Label("");
+			lblDescription.setWrapText(true);
+			lblDescription.setStyle("-fx-font-style: italic; -fx-padding: 10px");
+			
+			bodyContainer.getChildren().addAll(classHbox, lblDescription);
+			
+			rbFighter.setOnAction(e -> lblDescription.setText(fighter.getClassDescription()));
+			rbMage.setOnAction(e -> lblDescription.setText(mage.getClassDescription()));
+			rbCleric.setOnAction(e -> lblDescription.setText(cleric.getClassDescription()));
+			
+			btnConfirm.setOnMouseClicked(e -> { // -> CharacterRaceScene
+				// checks and saves the selected button with the selected class
+				if (rbFighter.isSelected()) {
+					character.setCharClass(fighter);
+					rbFighter.setSelected(true);
+					showScene(new CharacterRaceScene(stage, character), 3);
+				} else if (rbMage.isSelected()) {
+					rbMage.setSelected(true);
+					character.setCharClass(mage);
+					showScene(new CharacterRaceScene(stage, character), 3);
+				} else if (rbCleric.isSelected()) {
+					rbCleric.setSelected(true);
+					character.setCharClass(cleric);
+					showScene(new CharacterRaceScene(stage, character), 3);
 				}
 			});
 			
 			// back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
-				stage.setScene(new Scene(new CharacterNameScene(stage, character), 600, 600));
+				showScene(new CharacterNameScene(stage, character), 1);
 			});
 			
 		}
 	}
 
 	// CharacterRaceScene class that customizes scene and will project next scene when user presses "Confirm" button
-	class CharacterRaceScene extends HBox {
+	class CharacterRaceScene extends VBox {
 		public CharacterRaceScene(Stage stage, Character character) {
-			// All available CharacterRace subclasses, and confirm and back buttons
-			RaceOne raceOne = new RaceOne();
-			RaceTwo raceTwo = new RaceTwo();
+			// ---- All containers in order to go in VBox
+			VBox headerContainer = new VBox();
+			Separator seperatorTop = new Separator(); // Divider line
+			HBox bodyContainer = new HBox();
+			
+			setMargin(seperatorTop, new Insets(-10, 0, 0, 0));
+			getChildren().addAll(headerContainer, seperatorTop, bodyContainer);
+			setSpacing(15);
+			setPadding(new Insets(20));
+
+			// ----- Header Container Setup
+			Label heading = new Label("Choose Your Race");
+			heading.setStyle("-fx-font-size: 24px; -fx-fontweight: bold;");
+			Label subtitle = new Label("Select race below to read its description");
+
+			VBox headerColumn = new VBox(5, heading, subtitle);
+			headerColumn.setAlignment(Pos.CENTER_LEFT);
+
 			Button btnConfirm = new Button("Confirm");
 			Button btnBack = new Button("Back");
 
+			HBox headerRow = new HBox(20);
+			headerRow.setAlignment(Pos.CENTER_LEFT);
+			HBox.setMargin(btnConfirm, new Insets(35, 0, 0, 0));
+			HBox.setMargin(btnBack, new Insets(35, 0, 0, -10));
+
+			Region spacer = new Region(); // Makes space between labels and button
+			HBox.setHgrow(spacer, Priority.ALWAYS);
+
+			headerRow.getChildren().addAll(headerColumn, spacer, btnConfirm, btnBack);
+			headerContainer.getChildren().add(headerRow);
+			headerContainer.setAlignment(Pos.CENTER_LEFT);
+			
+			// All available CharacterRace subclasses
+			RaceHuman human = new RaceHuman();
+			RaceElf elf = new RaceElf();
+			RaceDwarf dwarf = new RaceDwarf();
+			RaceHalfElf halfElf = new RaceHalfElf();
+			RaceHalfOrc halfOrc = new RaceHalfOrc();
+
 			// combo-box
 			ComboBox<CharacterRace> cbRace = new ComboBox<CharacterRace>();
-			cbRace.getItems().addAll(raceOne, raceTwo);
+			cbRace.getItems().addAll(human, elf, dwarf, halfElf, halfOrc);
 			cbRace.setPromptText("Choose a race: ");
+			
+			// --------- Race Description Label to describe selection
+			Label lblRaceName = new Label("");
+			lblRaceName.setStyle("-fx-font-style: bold; -fx-padding: 5px; -fx-font-size: 30px");			
+			Label lblDescription = new Label("");
+			lblDescription.setWrapText(true);
+			lblDescription.setStyle("-fx-font-style: italic; -fx-padding: 5px");
+			
+			// ------ update the race description with what is selected from comboBox
+			
+			cbRace.setOnAction(e -> {
+				CharacterRace selected = cbRace.getValue();
+				if (selected != null) {
+					lblRaceName.setText(selected.getRaceName());
+					lblDescription.setText(selected.getRaceDescription());
+				}
+			});
 
-			// getChildren()
-			getChildren().addAll(cbRace, btnConfirm, btnBack);
+			// ----- Body Container Setup
+			VBox leftBodyContainer = new VBox(10, lblRaceName, lblDescription);
+			leftBodyContainer.setPrefWidth(600);
+			leftBodyContainer.setAlignment(Pos.CENTER_LEFT);
+			
+			bodyContainer.getChildren().addAll(cbRace, leftBodyContainer);
+			bodyContainer.setSpacing(30);
+			
+			cbRace.setPrefWidth(100);
+			VBox.setMargin(lblRaceName, new Insets(0, 0, 0, 12));
+			VBox.setMargin(lblDescription, new Insets(0, 0, 0, 12));
 
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterAbilityScene
 				CharacterRace selectedRace = cbRace.getValue();
 				// checks if box is selected and saves selected box along with selected race
 				if (selectedRace != null) {
 					character.setCharRace(selectedRace);
-					stage.setScene(new Scene(new CharacterAbilityScene(stage, character), 600, 600));
-				} 
-				
+					showScene(new CharacterAbilityScene(stage, character), 4);
+				}
 			});
 			
 			// back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
-				stage.setScene(new Scene(new CharacterClassScene(stage, character), 600, 600));
+				showScene(new CharacterClassScene(stage, character), 2);
 			});
 
 		}
@@ -194,7 +397,7 @@ public class PAssign08b extends Application {
 		private Button rightCharisma = new Button("►");
 		
 		public CharacterAbilityScene(Stage stage, Character character) {
-			// c=Confirm and back buttons
+			// Confirm and back buttons
 			Button btnBack = new Button("Back");
 			Button btnConfirm = new Button("Confirm");
 			
@@ -228,12 +431,12 @@ public class PAssign08b extends Application {
 			
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterSheet
 				saveAbilities(character);
-				stage.setScene(new Scene(new CharacterSheet(stage, character), 600, 600));
+				showScene(new CharacterSheet(stage, character), 5);
 			});
 			
 			// back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
-				stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
+				showScene(new CharacterRaceScene(stage, character), 3);
 			});
 			
 			// sets text to previous inputs when user returns to this scene
@@ -280,7 +483,8 @@ public class PAssign08b extends Application {
 	class CharacterSheet extends VBox {
 		public CharacterSheet(Stage stage, Character character) {
 			// Labels for all updated information goes on sheet, and back and save buttons
-			Label name = new Label("Name: " + character.getName());
+			Label playerName = new Label("Player Name: " + character.getPlayerName());
+			Label characterName = new Label("CharacterName: " + character.getCharacterName());
 			Label classType = new Label("Class: " + character.getCharClass());
 			Label raceType = new Label("Race: " + character.getCharRace());
 			Label strength = new Label("Strength: " + character.getStrength());
@@ -297,16 +501,17 @@ public class PAssign08b extends Application {
 			HBox hbox = new HBox(btnBack, btnSave);
 			
 			// getChildren
-			getChildren().addAll(name, classType, raceType, strength, dexterity, constitution, intelligence, wisdom, charisma, hbox);
+			getChildren().addAll(playerName, characterName, classType, raceType, strength, dexterity, constitution, intelligence, wisdom, charisma, hbox);
 			
 			// see print() method
 			btnSave.setOnMouseClicked(e -> {
 				print(this, stage);
 			});
 			
+			
 			// back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
-				stage.setScene(new Scene(new CharacterAbilityScene(stage, character), 600, 600));
+				showScene(new CharacterAbilityScene(stage, character), 4);
 			});
 			
 		}
@@ -330,7 +535,8 @@ public class PAssign08b extends Application {
 
 	// Character class that stores character information
 	class Character {
-		private String name;
+		private String playerName;
+		private String characterName;
 		private CharacterClass charClass;
 		private CharacterRace charRace;
 		private int strength;
@@ -339,13 +545,26 @@ public class PAssign08b extends Application {
 		private int intelligence;
 		private int wisdom;
 		private int charisma;
-
-		public String getName() {
-			return name;
+		
+		Character() {
+			setPlayerName("");
+			setCharacterName("");
+		}
+		
+		public String getPlayerName() {
+			return playerName;
+		}
+		
+		public void setPlayerName(String playerName) {
+			this.playerName = playerName;			
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public String getCharacterName() {
+			return characterName;
+		}
+
+		public void setCharacterName(String name) {
+			this.characterName = name;
 		}
 
 		public CharacterClass getCharClass() {
@@ -413,112 +632,211 @@ public class PAssign08b extends Application {
 		}
 
 	}
+	
+	class CharacterCreationTracker extends HBox {
+		private String[] pages = { "Name", "Class", "Race", "Abilities", "Review" };
+		
+		public CharacterCreationTracker (int currentPage) {
+			setAlignment(Pos.CENTER);
+			
+		    HBox pageRow = new HBox();
+		    pageRow.setAlignment(Pos.TOP_CENTER);
+		    
+		    Line line = new Line(0, 0, 100 * (pages.length - 1), 0);
+		    line.setStroke(Color.web("#1365d1"));
+		    line.setStrokeWidth(2);
+		    line.setTranslateY(5);
+		    
+			for (int i = 0; i < pages.length; i++) {
+				int pageNumber = i + 1;
+				Circle circle = new Circle(5);
+				
+				Label name = new Label(pages[i]);
+				name.setAlignment(Pos.CENTER);
+				
+				if (pageNumber <= currentPage) {
+					circle.setFill(Color.web("#1365d1"));
+					circle.setStroke(Color.web("#1365d1"));
+				} else {
+					circle.setFill(Color.WHITE);
+					circle.setStroke(Color.web("#1365d1"));
+				}
+				VBox pageColumn = new VBox(5, circle, name);
+				pageColumn.setAlignment(Pos.TOP_CENTER);
+				pageColumn.setPrefWidth(100);
+				pageColumn.setMinWidth(100);
+				pageRow.getChildren().add(pageColumn);
+			}
+			
+			StackPane container = new StackPane(line, pageRow);
+			StackPane.setAlignment(line, Pos.TOP_CENTER);
+			getChildren().add(container);
+		}
+	}
 
 	// CharacterClass class that the Character class can use to set a class object
 	abstract class CharacterClass {
-		private String name;
+		private String className;
 
-		public CharacterClass(String name) {
-			setName(name);
+		public CharacterClass(String className) {
+			setClassName(className);
 		}
 
-		public String getName() {
-			return name;
+		public String getClassName() {
+			return className;
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public void setClassName(String className) {
+			this.className = className;
 		}
 
 		@Override
 		public String toString() {
-			return name;
+			return className;
 		}
 
 	}
 
+	// placeholder subclasses of CharacterClass that will specify particular stats
+	class Fighter extends CharacterClass {
+		private String classDescription = "Fighters are trained warriors who rely on skill, strength, and weapons rather than magic to win battles. They can use almost any weapon or armor, making them versatile frontline soldiers who can both take heavy hits and dish out fast, deadly attacks.";
+		
+		Fighter() {
+			super("Fighter");
+		}
+		
+		public String getClassDescription() {
+			return classDescription;
+		}
+	}
+	
+	class Mage extends CharacterClass {
+		private String classDescription = "Mages are scholars and spellcasters who study the arcane arts to bend reality to their will. Though physically fragile and unable to wear heavy armor, they stay in the backlines to unleash devastating elemental magic, summon creatures, and control the battlefield with powerful spells.";
+		
+		Mage() {
+			super("Mage");
+		}
+		
+		public String getClassDescription() {
+			return classDescription;
+		}
+	}
+	
+	class Cleric extends CharacterClass{
+		
+		private String classDescription =  "Clerics are devout warriors who channel divine magic granted by the gods they serve. Wearing medium or heavy armor, they stand near the frontlines to heal wounded allies, banish undead monsters, and smite enemies with sacred power.";
+		
+		Cleric() {
+			super("Cleric");
+		}
+		
+		public String getClassDescription() {
+			return classDescription;
+		}
+	}
+	
+	
 	// CharacterRace class that the Character class can use to set a race object
 	abstract class CharacterRace {
-		private String name;
+		private String raceName;
+		private String raceDescription;
 
-		public CharacterRace(String name) {
-			setName(name);
+		public CharacterRace(String raceName) {
+			setRaceName(raceName);
 		}
 
-		public String getName() {
-			return name;
+		public String getRaceName() {
+			return raceName;
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public void setRaceName(String raceName) {
+			this.raceName = raceName;
+		}
+		
+		public String getRaceDescription() {
+			return raceDescription;
+		}
+		
+		public void setRaceDescription(String raceDescription) {
+			this.raceDescription = raceDescription;
 		}
 
-		public void applyStats(Character character) {
-			character.setDexterity(character.getDexterity());
-			character.setCharisma(character.getCharisma());
-			character.setIntelligence(character.getIntelligence());
-			character.setStrength(character.getStrength());
-			character.setWisdom(character.getWisdom());
-			character.setConstitution(character.getConstitution());
-		}
+		abstract void applyStats(Character character);
 
 		@Override
 		public String toString() {
-			return name;
+			return raceName;
 		}
 	}
 
 	// placeholder subclasses of CharacterRace that will specify particular stats
-	class RaceOne extends CharacterRace {
-		RaceOne() {
-			super("Race #1");
-
+	class RaceHuman extends CharacterRace {
+		RaceHuman() {
+			super("Human");
+			setRaceDescription("Humans are the most adaptable and ambitious of the common races. Though their lifespans are relatively short, they make up for it with endless drive, curiosity, and versatility, allowing them to excel in almost any role, build sprawling empires, and quickly adjust to changing times.");
 		}
 
 		@Override
 		public void applyStats(Character character) {
-			character.setDexterity(character.getDexterity());
-			character.setCharisma(character.getCharisma());
-			character.setIntelligence(character.getIntelligence());
-			character.setStrength(character.getStrength());
-			character.setWisdom(character.getWisdom());
-			character.setConstitution(character.getConstitution());
-
-		}
-	}
-
-	class RaceTwo extends CharacterRace { // placeholder subclass with fixed ability score increase
-		RaceTwo() {
-			super("Race #2");
-		}
-
-		@Override
-		public void applyStats(Character character) {
-			character.setDexterity(character.getDexterity() + 1);
 			character.setCharisma(character.getCharisma() + 1);
-			character.setIntelligence(character.getIntelligence() + 1);
-			character.setStrength(character.getStrength() + 1);
-			character.setWisdom(character.getWisdom() + 1);
 			character.setConstitution(character.getConstitution() + 1);
 
 		}
 	}
 
-	// placeholder subclasses of CharacterClass that will specify particular stats
-	class ClassOne extends CharacterClass {
-
-		ClassOne() {
-			super("Class #1");
+	class RaceElf extends CharacterRace { // placeholder subclass with fixed ability score increase
+		RaceElf() {
+			super("Elf");
+			setRaceDescription("Elves are graceful, long-lived beings with a deep connection to nature and the arcane arts. Known for their keen senses, slender builds, and unmatched agility, they spend centuries perfecting their crafts, magic, and martial skills while maintaining an aloof, timeless perspective on the world.");
 		}
 
+		@Override
+		public void applyStats(Character character) {
+			character.setDexterity(character.getDexterity() + 1);
+			character.setIntelligence(character.getIntelligence() + 1);
+		}
 	}
-
-	class ClassTwo extends CharacterClass {
-
-		ClassTwo() {
-			super("Class #2");
+	
+	class RaceDwarf extends CharacterRace {
+		RaceDwarf() {
+			super("Dwarf");
+			setRaceDescription("Dwarves are stout, rugged folk known for their resilience, loyalty, and unmatched skill in mining, stonework, and metalcraft. Living deep within mountain strongholds, they are fierce, stubborn warriors who value honor, tradition, and the forging of legendary weapons and armor.");
 		}
 
+		@Override
+		public void applyStats(Character character) {
+			character.setWisdom(character.getWisdom() + 1);
+			character.setConstitution(character.getConstitution() + 1);
+
+		}
+	}
+	
+	class RaceHalfElf extends CharacterRace {
+		RaceHalfElf() {
+			super("Half-Elf");
+			setRaceDescription("Half-elves blend the best traits of their dual heritage, combining human ambition and adaptability with elven grace and keen senses. Often walking between two worlds without fully belonging to either, they tend to be charismatic, natural diplomats and travelers who easily charm others and thrive in diverse company.");
+		}
+
+		@Override
+		public void applyStats(Character character) {
+			character.setCharisma(character.getCharisma() + 1);
+			character.setIntelligence(character.getIntelligence() + 1);
+		}
+	}
+	
+	class RaceHalfOrc extends CharacterRace {
+		RaceHalfOrc() {
+			super("Half-Orc");
+			setRaceDescription(
+					"Half-orcs combine human ingenuity with the towering stature and raw physical strength of their orcish ancestry. Often viewed with suspicion by civilized societies, they possess fierce endurance and an unstoppable drive, making them intimidating, relentless warriors who rely on sheer grit and power to survive.");
+		}
+
+		@Override
+		public void applyStats(Character character) {
+			character.setCharisma(character.getCharisma() - 1);
+			character.setStrength(character.getStrength() + 2);
+			character.setConstitution(character.getConstitution() + 1);
+		}
 	}
 
 }
