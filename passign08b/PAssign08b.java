@@ -484,12 +484,14 @@ public class PAssign08b extends Application {
 
 	}
 
-	// CharacterClass class that the Character class can use to set a class object
+	// --------CharacterClass class that the Character class can use to set a class object
 	abstract class CharacterClass {
 		private String className;
+		private ClassAbility[] abilities;
 
-		public CharacterClass(String className) {
+		public CharacterClass(String className, ClassAbility[] abilities) {
 			setClassName(className);
+			this.abilities = abilities;
 		}
 
 		public String getClassName() {
@@ -499,6 +501,10 @@ public class PAssign08b extends Application {
 		public void setClassName(String className) {
 			this.className = className;
 		}
+		
+		public ClassAbility[] getAbilities() {
+			return abilities;
+		}
 
 		@Override
 		public String toString() {
@@ -506,7 +512,31 @@ public class PAssign08b extends Application {
 		}
 
 	}
+	
+	class ClassAbility {
+		private final String name;
+		private final String description;
+		
+		public ClassAbility(String name, String description) {
+			this.name = name;
+			this.description = description;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("%s : %s", name, description);
+		}
+	}
 
+<<<<<<< Updated upstream
 	// CharacterRace class that the Character class can use to set a race object
 	abstract class CharacterRace {
 		private String name;
@@ -575,11 +605,19 @@ public class PAssign08b extends Application {
 	
 
 	// placeholder subclasses of CharacterClass that will specify particular stats
+=======
+	// ---------placeholder subclasses of CharacterClass that will specify particular stats
+>>>>>>> Stashed changes
 	class Fighter extends CharacterClass {
 		private String classDescription = "Fighters are trained warriors who rely on skill, strength, and weapons rather than magic to win battles. They can use almost any weapon or armor, making them versatile frontline soldiers who can both take heavy hits and dish out fast, deadly attacks.";
 		
 		Fighter() {
-			super("Fighter");
+			super("Fighter", new ClassAbility[] {
+					new ClassAbility("Power Strike", "Deliver a heavy blow that deals extra physical damage. 1d12 + STR"),
+					new ClassAbility("Second Wind", "Catch your breath in battle to recover health. 1d10 + CON"),
+					new ClassAbility("Shield Bash", "Slam a shield into a target to deal damage and knock them back. 1d8 + STR"),
+					new ClassAbility("Cleave", "Sweep your weapon to hit nearby foes in a wide arc. 2d6 + STR")
+			});
 		}
 		
 		public String getClassDescription() {
@@ -591,7 +629,12 @@ public class PAssign08b extends Application {
 		private String classDescription = "Mages are scholars and spellcasters who study the arcane arts to bend reality to their will. Though physically fragile and unable to wear heavy armor, they stay in the backlines to unleash devastating elemental magic, summon creatures, and control the battlefield with powerful spells.";
 
 		Mage() {
-			super("Mage");
+			super("Mage", new ClassAbility[] {
+					new ClassAbility("Firebolt", "Hurl a mote of fire at a target for ranged arcane damage. 1d10 + INT"),
+					new ClassAbility("Arcane Shield", "Raise a barrier of force to ward off incoming attacks. 1d6 + INT"),
+					new ClassAbility("Frost Ray", "Fire a freezing beam that chills and slows a foe. 1d8 + INT"),
+					new ClassAbility("Thunderclap", "Release a concussive burst of thunder around you. 2d6 + INT")
+			});
 		}
 		
 		public String getClassDescription() {
@@ -603,13 +646,29 @@ public class PAssign08b extends Application {
 		private String classDescription =  "Clerics are devout warriors who channel divine magic granted by the gods they serve. Wearing medium or heavy armor, they stand near the frontlines to heal wounded allies, banish undead monsters, and smite enemies with sacred power.";
 		
 		Cleric() {
-			super("Cleric");
+			super("Cleric", new ClassAbility[] {
+					new ClassAbility("Sacred Flame", "Call down radiant flame on a target to deal divine damage. 1d8 + WIS"),
+					new ClassAbility("Healing Word", "Speak a quick prayer to restore health to an ally. 1d4 + WIS"),
+					new ClassAbility("Guiding Bolt", "Launch a flash of light that damages a foe and aids the next attack. 4d6"),
+					new ClassAbility("Turn Undead", "Channel divine authority to repel nearby undead. 2d8 + WIS")					
+			});
 		}
 		
 		public String getClassDescription() {
 			return classDescription;
 		}
 	}
+<<<<<<< Updated upstream
+=======
+	
+	//---------- Class Abilities
+	
+	
+	// CharacterRace class that the Character class can use to set a race object
+	abstract class CharacterRace {
+		private String raceName;
+		private String raceDescription;
+>>>>>>> Stashed changes
 
 }
 
