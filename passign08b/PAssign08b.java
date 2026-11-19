@@ -1,6 +1,7 @@
 package passign08b;
  
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -10,12 +11,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.geometry.Insets;
+import javafx.util.Duration;
 
 /**
  * - Running window opens with the first scene, which is a class. Each ___Scene class has a confirm button that projects the next scene 
@@ -257,25 +260,6 @@ public class PAssign08b extends Application {
 		private TextField tfWisdom = new TextField();
 		private TextField tfCharisma = new TextField();
 		
-//		private Label strength = new Label("Strength: ");
-//		private Label dexterity = new Label("Dexterity: ");
-//		private Label constitution = new Label("Constitution: ");
-//		private Label intelligence = new Label("Intelligence: ");
-//		private Label wisdom = new Label("Wisdom: ");
-//		private Label charisma = new Label("Charisma:");
-		
-//		private Button leftStrength = new Button("◄");
-//		private Button rightStrength = new Button("►");
-//		private Button leftDexterity = new Button("◄");
-//		private Button rightDexterity = new Button("►");
-//		private Button leftConstitution = new Button("◄");
-//		private Button rightConstitution = new Button("►");
-//		private Button leftIntelligence = new Button("◄");
-//		private Button rightIntelligence = new Button("►");
-//		private Button leftWisdom = new Button("◄");
-//		private Button rightWisdom = new Button("►");
-//		private Button leftCharisma = new Button("◄");
-//		private Button rightCharisma = new Button("►");
 		
 		public CharacterAbilityScene(Stage stage, Character character) {
 			availablePoints = (80 - character.getStrength() - character.getDexterity() - character.getConstitution() - character.getIntelligence() - character.getWisdom() - character.getCharisma());
@@ -296,45 +280,21 @@ public class PAssign08b extends Application {
 			tfWisdom.setText(String.valueOf(character.getWisdom()));
 			tfCharisma.setText(String.valueOf(character.getCharisma()));
 			
-//			// HBoxes for individual abilities and their buttons
-//			HBox hStrength = new HBox(leftStrength, tfStrength, rightStrength);
-//			HBox hDexterity = new HBox(leftDexterity, tfDexterity, rightDexterity);
-//			HBox hConstitution = new HBox(leftConstitution, tfConstitution, rightConstitution);
-//			HBox hIntelligence = new HBox(leftIntelligence, tfIntelligence, rightIntelligence);
-//			HBox hWisdom = new HBox(leftWisdom, tfWisdom, rightWisdom);
-//			HBox hCharisma = new HBox(leftCharisma, tfCharisma, rightCharisma);
-//			HBox buttons = new HBox(btnConfirm, btnBack);
-//			
-//			// getChildren()
-//			getChildren().addAll(strength, hStrength, dexterity, hDexterity, constitution, hConstitution, 
-//					intelligence, hIntelligence, wisdom, hWisdom, charisma, hCharisma, buttons);
+			// ----- Making a gridPane to line up all labels buttons and text fields to be lined up in columns ------
+			GridPane grid = new GridPane();
+			grid.setHgap(10);
+			grid.setVgap(10);
+			
+			
+			createStatRow(grid, 0, "STR: ", "STRENGTH - Physical power, imacts melee attacks, and carrying capacity.", tfStrength);
+			createStatRow(grid, 1, "DEX: ", "DEXTERITY - Agility, reflexes, balance, and ranged accuracy", tfDexterity);
+			createStatRow(grid, 2, "CON: ", "CONSTITUTION - Health, stamina, and resistance to damage or poison", tfConstitution);
+			createStatRow(grid, 3, "INT: ", "INTELLIGENCE - Reasoning, memory, and arcane power", tfIntelligence);
+			createStatRow(grid, 4, "WIS: ", "WISDOM - Perception, intuition, willpower, and divine magic", tfWisdom);
+			createStatRow(grid, 5, "CHA: ", "CHARISMA - Force of personality, persuasion, and leadership", tfCharisma);
 			
 			// ---------- add items to VBox using new method
-			getChildren().addAll(
-					lblPool,
-					createStatRow("STR: ", tfStrength),
-					createStatRow("DEX: ", tfDexterity),
-					createStatRow("CON: ", tfConstitution),
-					createStatRow("INT: ", tfIntelligence),
-					createStatRow("WIS: ", tfWisdom),
-					createStatRow("CHA: ", tfCharisma),
-					buttons
-					
-			);
-//			// Adjusts left and right buttons to any desired number within range(assuming there is a range)
-//			leftStrength.setOnMouseClicked(e -> leftButtonCondition(tfStrength));
-//			leftDexterity.setOnMouseClicked(e -> leftButtonCondition(tfDexterity));
-//			leftConstitution.setOnMouseClicked(e -> leftButtonCondition(tfConstitution));
-//			leftIntelligence.setOnMouseClicked(e -> leftButtonCondition(tfIntelligence));
-//			leftWisdom.setOnMouseClicked(e -> leftButtonCondition(tfWisdom));
-//			leftCharisma.setOnMouseClicked(e -> leftButtonCondition(tfCharisma));
-//			
-//			rightStrength.setOnMouseClicked(e -> rightButtonCondition(tfStrength));
-//			rightDexterity.setOnMouseClicked(e -> rightButtonCondition(tfDexterity));
-//			rightConstitution.setOnMouseClicked(e -> rightButtonCondition(tfConstitution));
-//			rightIntelligence.setOnMouseClicked(e -> rightButtonCondition(tfIntelligence));
-//			rightWisdom.setOnMouseClicked(e -> rightButtonCondition(tfWisdom));
-//			rightCharisma.setOnMouseClicked(e -> rightButtonCondition(tfCharisma));
+			getChildren().addAll(lblPool, grid, buttons	);
 			
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterSheet
 				saveAbilities(character);
@@ -348,7 +308,15 @@ public class PAssign08b extends Application {
 						
 		}
 		
-		private HBox createStatRow(String labelText, TextField tf) {
+		private void createStatRow(GridPane grid, int rowIndex, String labelText, String hoverText, TextField tf) {
+			Label lblStat = new Label(labelText);
+			lblStat.setPickOnBounds(true);
+			
+			// ------- hover popup when mousing over stat label
+			Tooltip tooltip = new Tooltip(hoverText);
+			tooltip.setShowDelay(Duration.millis(50));
+			tooltip.install(lblStat, tooltip);;
+			
 			tf.setEditable(false);
 			tf.setPrefWidth(50);
 			
@@ -358,7 +326,10 @@ public class PAssign08b extends Application {
 			btnLeft.setOnMouseClicked(e -> modifyStat(tf, -1));
 			btnRight.setOnMouseClicked(e -> modifyStat(tf, 1));
 			
-			return new HBox(10, new Label(labelText), btnLeft, tf, btnRight);
+			grid.add(lblStat, 0, rowIndex);
+			grid.add(btnLeft, 1, rowIndex);
+			grid.add(tf, 2, rowIndex);
+			grid.add(btnRight, 3, rowIndex);
 		}
 		
 		public void modifyStat(TextField textField, int delta) {
