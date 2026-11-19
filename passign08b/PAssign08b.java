@@ -61,7 +61,7 @@ public class PAssign08b extends Application {
 		CharacterNameScene characterScene = new CharacterNameScene(stage, character);
 
 		// Set first scene here and CharacterScene class will hold action event for next scene
-		Scene scene = new Scene(root, 800, 350);
+		Scene scene = new Scene(root, 800, 380);
 		showScene(new CharacterNameScene(stage, character), 1);
 		
 		// prioritizes focus to be on entire node (to prevent cursor from automatically setting into text field)
@@ -346,7 +346,7 @@ public class PAssign08b extends Application {
 			
 			// ------ update the race description with what is selected from comboBox
 			
-			cbRace.setOnMouseClicked(e -> {
+			cbRace.setOnAction(e -> {
 				CharacterRace selected = cbRace.getValue();
 				if (selected != null) {
 					lblRaceName.setText(selected.getRaceName());
@@ -471,7 +471,7 @@ public class PAssign08b extends Application {
 			// HBox for gridpanes
 			HBox statContainer = new HBox(30);
 			statContainer.setAlignment(Pos.CENTER);
-			statContainer.setPadding(new Insets(35, 0, 0, 0));
+			statContainer.setPadding(new Insets(50, 0, 0, 0));
 			statContainer.getChildren().addAll(leftGrid, rightGrid);
 			
 			//VBox for lblPool and lblPoints
@@ -584,8 +584,8 @@ public class PAssign08b extends Application {
 
 			setMargin(seperatorTop, new Insets(-5, 0, 0, 0));
 			getChildren().addAll(headerContainer, seperatorTop, bodyContainer);
-			setSpacing(15);
-			setPadding(new Insets(20));
+			setSpacing(10);
+			setPadding(new Insets(15));
 
 			// ----- Header Container Setup
 			Label heading = new Label("Character Review");
@@ -659,14 +659,19 @@ public class PAssign08b extends Application {
 				    attributesHeader
 				};
 
-				
+			bodyContainer.setStyle("-fx-font-size: 14px;");
+			
 			for (Label label : labels) {
-			    label.setStyle("-fx-font-weight: bold;");
+			    label.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 			}
+			
+			charInfoHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+			attributesHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
 			
 			// GridPane for attributes
 			GridPane grid = new GridPane();
-			grid.setHgap(10);
+			grid.setHgap(20);
+			grid.setVgap(2);
 			grid.add(strength, 0, 0);
 			grid.add(strengthInput, 1, 0);
 			grid.add(dexterity, 0, 1);
@@ -680,6 +685,19 @@ public class PAssign08b extends Application {
 			grid.add(charisma, 0, 5);
 			grid.add(charismaInput, 1, 5);
 			
+			// Gridpane for char info
+			GridPane infoGrid = new GridPane();
+			infoGrid.setHgap(20);
+			infoGrid.setVgap(6);
+			infoGrid.add(playerName, 0, 0);
+			infoGrid.add(playerInput, 1, 0);
+			infoGrid.add(characterName, 0, 1);
+			infoGrid.add(characterInput, 1, 1);
+			infoGrid.add(classType, 0, 2);
+			infoGrid.add(classInput, 1, 2);
+			infoGrid.add(raceType, 0, 3);
+			infoGrid.add(raceInput, 1, 3);
+
 			// Divider for left VBox
 			Separator divideChar = new Separator();
 			
@@ -687,14 +705,15 @@ public class PAssign08b extends Application {
 			Separator divideAttrib = new Separator();
 			
 			// VBox for character info
-			VBox charInfoContainer = new VBox();
-			charInfoContainer.setAlignment(Pos.CENTER);
-			charInfoContainer.getChildren().addAll(charInfoHeader, divideChar, playerName, playerInput, characterName,
-					characterInput, classType, classInput, raceType, raceInput);
+			VBox charInfoContainer = new VBox(6);
+			charInfoContainer.setAlignment(Pos.TOP_CENTER);
+			charInfoContainer.setPrefWidth(300);
+			charInfoContainer.getChildren().addAll(charInfoHeader, divideChar, infoGrid);
 			
 			// VBox for attributes
-			VBox attributesContainer = new VBox();
-			attributesContainer.setAlignment(Pos.CENTER);
+			VBox attributesContainer = new VBox(6);
+			attributesContainer.setAlignment(Pos.TOP_CENTER);
+			attributesContainer.setPrefWidth(200);
 			attributesContainer.getChildren().addAll(attributesHeader, divideAttrib, grid);
 			
 			bodyContainer.setSpacing(60);
