@@ -1,6 +1,7 @@
 package passign08b;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -28,6 +29,10 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.util.Duration;
+
 
 /**
  * - Running window opens with the first scene, which is a class. Each ___Scene class has a confirm button that projects the next scene 
@@ -76,6 +81,7 @@ public class PAssign08b extends Application {
 	class CharacterNameScene extends VBox {
 
 		public CharacterNameScene(Stage stage, Character character) {
+
 			// ---- All containers in order to go in VBox
 			VBox headingBox = new VBox();
 			Separator seperatorTop = new Separator(); // Divider line
@@ -116,10 +122,19 @@ public class PAssign08b extends Application {
 			Label playerError = new Label();
 			playerError.setStyle("-fx-text-fill: #eb4034;");
 			VBox playerVbox = new VBox(tfPlayerName, playerError);
+
+			// ---------- Set input and UI for Player Name------
+			Label lblPlayerName = new Label("Player Name: ");
+			TextField tfPlayerName = new TextField(character.getPlayerName());
+			Label playerError = new Label();
+			VBox playerVbox = new VBox(tfPlayerName, playerError);
+			HBox playerHbox = new HBox(lblPlayerName, playerVbox);
+
 			
 			// ---------- set input and UI for Character Name ------
 			Label lblCharacterName = new Label("Character Name: ");
 			TextField tfCharacterName = new TextField(character.getCharacterName());
+
 			tfCharacterName.setPromptText("Enter Character Name...");
 			Label characterError = new Label();
 			characterError.setStyle("-fx-text-fill: #eb4034;");
@@ -139,10 +154,26 @@ public class PAssign08b extends Application {
 			setPadding(new Insets(30));
 			setAlignment(Pos.CENTER);
 			
+
+			Label characterError = new Label();
+			VBox characterVbox = new VBox(tfCharacterName, characterError);
+			HBox characterHbox = new HBox(lblCharacterName, characterVbox);
+
+			Button btnConfirm = new Button("Confirm");
+			
+			//------ put spacing between items
+			setSpacing(10);
+			setPadding(new Insets(20));
+			
+			// getChildren();
+			getChildren().addAll(playerHbox, characterHbox, btnConfirm);
+
+
 			btnConfirm.setOnAction(e -> { // -> CharacterClassScene
 				// -------- clear the errors before checking
 				characterError.setText("");
 				playerError.setText("");
+
 
 				// takes trimmed input and store in variable
 				String pName = tfPlayerName.getText().trim();
@@ -160,11 +191,37 @@ public class PAssign08b extends Application {
 					character.setCharacterName(charName); // stores the character name in character class data field
 					character.setPlayerName(pName);
 					showScene(new CharacterClassScene(stage, character), 2); // sets scene so window presents CharacterClssScene
+
+				
+				// takes trimmed input and store in variable
+				String pName = tfPlayerName.getText().trim();
+				String charName = tfCharacterName.getText().trim();
+				
+				// -------- error checks for if the fields have text -----
+				if (pName.isEmpty() && charName.isEmpty()) { // error checks for empty textfield
+					playerError.setText("*Player Name cannot be blank");
+					characterError.setText("*Character Name cannot be blank");
+				} else if (pName.isEmpty()){
+					playerError.setText("*Name cannot be blank");
+				} else if (charName.isEmpty()) {
+					characterError.setText("*Name cannot be blank");
+				} else {
+				character.setCharacterName(charName); // stores the character name in character class data field
+				character.setPlayerName(pName);
+				stage.setScene(new Scene(new CharacterClassScene(stage, character), 600, 600)); // sets scene so window presents CharacterClssScene
+
 				}
-			});
+				});
 
 			// Allows Enter key to also interact the same way as btnConfirm.setOneAction
 			tfPlayerName.setOnKeyPressed(e -> {
+
+				if (e.getCode() == KeyCode.ENTER) {
+					btnConfirm.fire();
+				}
+			});
+			
+			tfCharacterName.setOnKeyPressed(e -> {
 				if (e.getCode() == KeyCode.ENTER) {
 					btnConfirm.fire();
 				}
@@ -183,6 +240,7 @@ public class PAssign08b extends Application {
 	// CharacterClassScene class that customizes scene and will project next scene when user presses "Confirm" button
 	class CharacterClassScene extends VBox {
 		public CharacterClassScene(Stage stage, Character character) {
+
 			// ---- All containers in order to go in VBox
 			VBox headerContainer = new VBox();
 			Separator seperatorTop = new Separator(); // Divider line
@@ -215,11 +273,16 @@ public class PAssign08b extends Application {
 			headerRow.getChildren().addAll(headerColumn, spacer, btnConfirm, btnBack);
 			headerContainer.getChildren().add(headerRow);
 			headerContainer.setAlignment(Pos.CENTER_LEFT);
-			
+
+			setSpacing(15);
+			setPadding(new Insets(20));
+
 			// ------------  Generate class instances
 			Fighter fighter = new Fighter();
 			Mage mage = new Mage();
 			Cleric cleric = new Cleric();
+			
+			Label lblTitle = new Label("Choose Your Class");
 			
 			// ------- radio buttons
 			ToggleGroup classGroup = new ToggleGroup();
@@ -244,6 +307,15 @@ public class PAssign08b extends Application {
 			
 			bodyContainer.getChildren().addAll(classHbox, lblDescription);
 			
+			HBox classHbox = new HBox();
+			classHbox.setSpacing(15);
+			classHbox.getChildren().addAll(rbFighter, rbMage, rbCleric);
+			
+			// -------------  Description Label that will be the block of text in open space
+			Label lblDescription = new Label("Select a class above to read its desctription");
+			lblDescription.setWrapText(true);
+			lblDescription.setStyle("-fx-font-style: italic; -fx-padding: 10px");
+			
 			rbFighter.setOnAction(e -> lblDescription.setText(fighter.getClassDescription()));
 			rbMage.setOnAction(e -> lblDescription.setText(mage.getClassDescription()));
 			rbCleric.setOnAction(e -> lblDescription.setText(cleric.getClassDescription()));
@@ -262,6 +334,28 @@ public class PAssign08b extends Application {
 					rbCleric.setSelected(true);
 					character.setCharClass(cleric);
 					showScene(new CharacterRaceScene(stage, character), 3);
+
+			Button btnConfirm = new Button("Confirm");
+			Button btnBack = new Button("Back");
+
+			// getChildren()
+			getChildren().addAll(lblTitle, classHbox, lblDescription, btnConfirm, btnBack);
+			
+			btnConfirm.setOnMouseClicked(e -> { /// -> CharacterRaceScene
+			// checks and saves the selected button with the selected class
+				if (rbFighter.isSelected()) {
+					character.setCharClass(fighter);
+					rbFighter.setSelected(true);
+					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
+				} else if (rbMage.isSelected()) {
+					rbMage.setSelected(true);
+					character.setCharClass(mage);
+					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
+				} else if (rbCleric.isSelected()) {
+					rbCleric.setSelected(true);
+					character.setCharClass(cleric);
+					stage.setScene(new Scene(new CharacterRaceScene(stage, character), 600, 600));
+
 				}
 			});
 			
@@ -312,6 +406,17 @@ public class PAssign08b extends Application {
 
 			Button btnConfirm = new Button("Confirm");
 			Button btnBack = new Button("Back");
+			setSpacing(15);
+			setPadding(new Insets(20));
+			
+			Label lblTitle = new Label("Choose your Race:");
+			
+			// All available CharacterRace subclasses
+			RaceHuman human = new RaceHuman();
+			RaceElf elf = new RaceElf();
+			RaceDwarf dwarf = new RaceDwarf();
+			RaceHalfElf halfElf = new RaceHalfElf();
+			RaceHalfOrc halfOrc = new RaceHalfOrc();
 
 			HBox headerRow = new HBox(20);
 			headerRow.setAlignment(Pos.CENTER_LEFT);
@@ -340,7 +445,11 @@ public class PAssign08b extends Application {
 			// --------- Race Description Label to describe selection
 			Label lblRaceName = new Label("");
 			lblRaceName.setStyle("-fx-font-style: bold; -fx-padding: 5px; -fx-font-size: 30px");			
+
 			Label lblDescription = new Label("");
+
+			Label lblDescription = new Label("Select race above to read its description");
+
 			lblDescription.setWrapText(true);
 			lblDescription.setStyle("-fx-font-style: italic; -fx-padding: 5px");
 			
@@ -365,6 +474,13 @@ public class PAssign08b extends Application {
 			cbRace.setPrefWidth(100);
 			VBox.setMargin(lblRaceName, new Insets(0, 0, 0, 12));
 			VBox.setMargin(lblDescription, new Insets(0, 0, 0, 12));
+
+			Button btnConfirm = new Button("Confirm");
+			Button btnBack = new Button("Back");
+			HBox buttons = new HBox(10, btnConfirm, btnBack);
+
+			// getChildren()
+			getChildren().addAll(lblTitle, cbRace, lblRaceName, lblDescription, buttons);
 
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterAbilityScene
 				CharacterRace selectedRace = cbRace.getValue();
@@ -490,6 +606,52 @@ public class PAssign08b extends Application {
 			
 			VBox.setVgrow(statContainer, Priority.ALWAYS);
 			VBox.setVgrow(bodyContainer, Priority.ALWAYS);
+		private int availablePoints;
+		private Label lblPool = new Label("Available Attribute Points: " + availablePoints);
+				
+		// Private data fields that set initial text fields to "0" and arrow buttons
+		private TextField tfStrength = new TextField();
+		private TextField tfDexterity = new TextField();
+		private TextField tfConstitution = new TextField();
+		private TextField tfIntelligence = new TextField();
+		private TextField tfWisdom = new TextField();
+		private TextField tfCharisma = new TextField();
+		
+		
+		public CharacterAbilityScene(Stage stage, Character character) {
+			availablePoints = (80 - character.getStrength() - character.getDexterity() - character.getConstitution() - character.getIntelligence() - character.getWisdom() - character.getCharisma());
+			lblPool.setText("Available Attibute Points: " + availablePoints);
+			setSpacing(10);
+			setPadding(new Insets(20));
+			
+			// --------- Hbox Confirm and back buttons
+			Button btnBack = new Button("Back");
+			Button btnConfirm = new Button("Confirm");
+			HBox buttons = new HBox(10, btnConfirm, btnBack);
+			
+			// -------- Set attribute fields based on character sheet ----
+			tfStrength.setText(String.valueOf(character.getStrength()));
+			tfDexterity.setText(String.valueOf(character.getDexterity()));
+			tfConstitution.setText(String.valueOf(character.getConstitution()));
+			tfIntelligence.setText(String.valueOf(character.getIntelligence()));
+			tfWisdom.setText(String.valueOf(character.getWisdom()));
+			tfCharisma.setText(String.valueOf(character.getCharisma()));
+			
+			// ----- Making a gridPane to line up all labels buttons and text fields to be lined up in columns ------
+			GridPane grid = new GridPane();
+			grid.setHgap(10);
+			grid.setVgap(10);
+			
+			
+			createStatRow(grid, 0, "STR: ", "STRENGTH - Physical power, imacts melee attacks, and carrying capacity.", tfStrength);
+			createStatRow(grid, 1, "DEX: ", "DEXTERITY - Agility, reflexes, balance, and ranged accuracy", tfDexterity);
+			createStatRow(grid, 2, "CON: ", "CONSTITUTION - Health, stamina, and resistance to damage or poison", tfConstitution);
+			createStatRow(grid, 3, "INT: ", "INTELLIGENCE - Reasoning, memory, and arcane power", tfIntelligence);
+			createStatRow(grid, 4, "WIS: ", "WISDOM - Perception, intuition, willpower, and divine magic", tfWisdom);
+			createStatRow(grid, 5, "CHA: ", "CHARISMA - Force of personality, persuasion, and leadership", tfCharisma);
+			
+			// ---------- add items to VBox using new method
+			getChildren().addAll(lblPool, grid, buttons	);
 			
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterSheet
 				saveAbilities(character);
@@ -500,6 +662,12 @@ public class PAssign08b extends Application {
 			btnBack.setOnMouseClicked(e -> {
 				showScene(new CharacterRaceScene(stage, character), 3);
 			});
+						
+		}
+		
+		private void createStatRow(GridPane grid, int rowIndex, String labelText, String hoverText, TextField tf) {
+			Label lblStat = new Label(labelText);
+			lblStat.setPickOnBounds(true);
 			
 		}
 		
@@ -521,6 +689,20 @@ public class PAssign08b extends Application {
 			btnLeft.setOnMouseClicked(e -> modifyStat(tf, -1));
 			btnRight.setOnMouseClicked(e -> modifyStat(tf, 1));
 
+			// ------- hover popup when mousing over stat label
+			Tooltip tooltip = new Tooltip(hoverText);
+			tooltip.setShowDelay(Duration.millis(50));
+			tooltip.install(lblStat, tooltip);;
+			
+			tf.setEditable(false);
+			tf.setPrefWidth(50);
+			
+			Button btnLeft = new Button("◄");
+			Button btnRight = new Button("►");
+			
+			btnLeft.setOnMouseClicked(e -> modifyStat(tf, -1));
+			btnRight.setOnMouseClicked(e -> modifyStat(tf, 1));
+      
 			grid.add(lblStat, 0, rowIndex);
 			grid.add(btnLeft, 1, rowIndex);
 			grid.add(tf, 2, rowIndex);
@@ -535,14 +717,23 @@ public class PAssign08b extends Application {
 				if (delta > 0 && availablePoints > 0) {
 					textField.setText(String.valueOf(newVal));
 					availablePoints--;
+
 					lblPoints.setText((String.valueOf(availablePoints)));
 				} else if (delta < 0) {
 					textField.setText(String.valueOf(newVal));
 					availablePoints++;
 					lblPoints.setText((String.valueOf(availablePoints)));
+
+					lblPool.setText("Available Attribute Points: " + availablePoints);	
+				} else if (delta < 0) {
+					textField.setText(String.valueOf(newVal));
+					availablePoints++;
+					lblPool.setText("Available Attribute Points: " + availablePoints);
+
 				}
 			}
 		}
+		
 		
 		// method that saves the ability inputs and stores them into character data fields
 		public void saveAbilities(Character character) {
@@ -555,23 +746,7 @@ public class PAssign08b extends Application {
 			character.getCharRace().applyStats(character);
 		}
 		
-		// method that conditions the floor for left button (assuming there is a floor)
-		public void leftButtonCondition(TextField textField) {
-			int num = Integer.parseInt(textField.getText());
-			
-			if (num > 0) {
-				textField.setText(String.format("%d", num - 1));
-			} 
-		}
 		
-		// method that conditions the ceiling for right button (assuming there is a ceiling)
-		public void rightButtonCondition(TextField textField) {
-			int num = Integer.parseInt(textField.getText());
-
-			if (num < 20) {
-				textField.setText(String.format("%d", num + 1));
-			}
-		}
 	}
 
 	// CharacterSheet class that will show all of the collected data for the user to view
@@ -595,6 +770,18 @@ public class PAssign08b extends Application {
 			VBox headerColumn = new VBox(5, heading, subtitle);
 			headerColumn.setAlignment(Pos.CENTER_LEFT);
 
+			// Labels for all updated information goes on sheet, and back and save buttons
+			Label playerName = new Label("Player Name: " + character.getPlayerName());
+			Label characterName = new Label("CharacterName: " + character.getCharacterName());
+			Label classType = new Label("Class: " + character.getCharClass());
+			Label raceType = new Label("Race: " + character.getCharRace());
+			Label strength = new Label("Strength: " + character.getStrength());
+			Label dexterity = new Label("Dexterity: " + character.getDexterity());
+			Label constitution = new Label("Constitution: " + character.getConstitution());
+			Label intelligence = new Label("Intelligence: " + character.getIntelligence());
+			Label wisdom = new Label("Wisdom: " + character.getWisdom());
+			Label charisma = new Label("Charisma: " + character.getCharisma());
+			
 			Button btnSave = new Button("Save");
 			Button btnBack = new Button("Back");
 
@@ -721,6 +908,9 @@ public class PAssign08b extends Application {
 			bodyContainer.setPadding(new Insets(2, 0, 0, 0));
 			VBox.setVgrow(bodyContainer, Priority.ALWAYS);
 			bodyContainer.getChildren().addAll(charInfoContainer, attributesContainer);
+
+			// getChildren
+			getChildren().addAll(playerName, characterName, classType, raceType, strength, dexterity, constitution, intelligence, wisdom, charisma, hbox);
 			
 			// see print() method
 			btnSave.setOnMouseClicked(e -> {
@@ -980,11 +1170,19 @@ public class PAssign08b extends Application {
 		
 		public String getRaceDescription() {
 			return raceDescription;
+
+		}
+		
+		public void setRaceDescription(String raceDescription) {
+			this.raceDescription = raceDescription;
+
 		}
 		
 		public void setRaceDescription(String raceDescription) {
 			this.raceDescription = raceDescription;
 		}
+
+		abstract void applyStats(Character character);
 
 		abstract void applyStats(Character character);
 
@@ -1052,13 +1250,21 @@ public class PAssign08b extends Application {
 	class RaceHalfOrc extends CharacterRace {
 		RaceHalfOrc() {
 			super("Half-Orc");
+
 			setRaceDescription(
 					"Half-orcs combine human ingenuity with the towering stature and raw physical strength of their orcish ancestry. Often viewed with suspicion by civilized societies, they possess fierce endurance and an unstoppable drive, making them intimidating, relentless warriors who rely on sheer grit and power to survive.");
+
+			setRaceDescription("Half-orcs combine human ingenuity with the towering stature and raw physical strength of their orcish ancestry. Often viewed with suspicion by civilized societies, they possess fierce endurance and an unstoppable drive, making them intimidating, relentless warriors who rely on sheer grit and power to survive.");
+
 		}
 
 		@Override
 		public void applyStats(Character character) {
+
 			character.setCharisma(character.getCharisma() - 1);
+
+			character.setCharisma(character.getCharisma() -1);
+
 			character.setStrength(character.getStrength() + 2);
 			character.setConstitution(character.getConstitution() + 1);
 		}
