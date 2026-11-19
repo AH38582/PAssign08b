@@ -11,6 +11,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -24,6 +25,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -85,7 +87,7 @@ public class PAssign08b extends Application {
 			
 			// ----- Header Container Setup
 			Label heading = new Label("Create Your Character");
-			heading.setStyle("-fx-font-size: 24px; -fx-fontweight: bold;");
+			heading.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 			Label subtitle = new Label("Enter your player and character name below.");
 			
 			VBox headerColumn = new VBox(5, heading, subtitle);
@@ -193,7 +195,7 @@ public class PAssign08b extends Application {
 			
 			// ----- Header Container Setup
 			Label heading = new Label("Choose Your Class");
-			heading.setStyle("-fx-font-size: 24px; -fx-fontweight: bold;");
+			heading.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 			Label subtitle = new Label("Select a class below to read its description.");
 
 			VBox headerColumn = new VBox(5, heading, subtitle);
@@ -268,6 +270,22 @@ public class PAssign08b extends Application {
 				showScene(new CharacterNameScene(stage, character), 1);
 			});
 			
+			// saves user's last selected radio button
+			CharacterClass saved = character.getCharClass();
+			if (character.getCharClass() != null) {
+				String name = saved.getClassName();
+				if (name.equals(fighter.getClassName())) {
+					rbFighter.setSelected(true);
+					lblDescription.setText(fighter.getClassDescription());
+				} else if (name.equals(mage.getClassName())) {
+					rbMage.setSelected(true);
+					lblDescription.setText(mage.getClassDescription());
+				} else if (name.equals(cleric.getClassName())) {
+					rbCleric.setSelected(true);
+					lblDescription.setText(cleric.getClassDescription());
+				}
+			}
+			
 		}
 	}
 
@@ -286,7 +304,7 @@ public class PAssign08b extends Application {
 
 			// ----- Header Container Setup
 			Label heading = new Label("Choose Your Race");
-			heading.setStyle("-fx-font-size: 24px; -fx-fontweight: bold;");
+			heading.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 			Label subtitle = new Label("Select race below to read its description");
 
 			VBox headerColumn = new VBox(5, heading, subtitle);
@@ -328,7 +346,7 @@ public class PAssign08b extends Application {
 			
 			// ------ update the race description with what is selected from comboBox
 			
-			cbRace.setOnAction(e -> {
+			cbRace.setOnMouseClicked(e -> {
 				CharacterRace selected = cbRace.getValue();
 				if (selected != null) {
 					lblRaceName.setText(selected.getRaceName());
@@ -361,73 +379,117 @@ public class PAssign08b extends Application {
 			btnBack.setOnMouseClicked(e -> {
 				showScene(new CharacterClassScene(stage, character), 2);
 			});
-
+			
 		}
 
 	}
 
 	// CharacterAbilityScene class that customizes scene and will project next scene when user presses "Confirm" button
 	class CharacterAbilityScene extends VBox {
+		
+		private int availablePoints;
+		private Label lblPool = new Label("Available Attribute Points");
+		private Label lblPoints = new Label(String.valueOf(availablePoints));
+		
 		// Private data fields that set initial text fields to "0" and arrow buttons
-		private TextField tfStrength = new TextField("0");
-		private TextField tfDexterity = new TextField("0");
-		private TextField tfConstitution = new TextField("0");
-		private TextField tfIntelligence = new TextField("0");
-		private TextField tfWisdom = new TextField("0");
-		private TextField tfCharisma = new TextField("0");
-		
-		private Label strength = new Label("Strength: ");
-		private Label dexterity = new Label("Dexterity: ");
-		private Label constitution = new Label("Constitution: ");
-		private Label intelligence = new Label("Intelligence: ");
-		private Label wisdom = new Label("Wisdom: ");
-		private Label charisma = new Label("Charisma:");
-		
-		private Button leftStrength = new Button("◄");
-		private Button rightStrength = new Button("►");
-		private Button leftDexterity = new Button("◄");
-		private Button rightDexterity = new Button("►");
-		private Button leftConstitution = new Button("◄");
-		private Button rightConstitution = new Button("►");
-		private Button leftIntelligence = new Button("◄");
-		private Button rightIntelligence = new Button("►");
-		private Button leftWisdom = new Button("◄");
-		private Button rightWisdom = new Button("►");
-		private Button leftCharisma = new Button("◄");
-		private Button rightCharisma = new Button("►");
+		private TextField tfStrength = new TextField();
+		private TextField tfDexterity = new TextField();
+		private TextField tfConstitution = new TextField();
+		private TextField tfIntelligence = new TextField();
+		private TextField tfWisdom = new TextField();
+		private TextField tfCharisma = new TextField();
 		
 		public CharacterAbilityScene(Stage stage, Character character) {
-			// Confirm and back buttons
-			Button btnBack = new Button("Back");
+			
+			// ---- All containers in order to go in VBox
+			VBox headerContainer = new VBox();
+			Separator seperatorTop = new Separator(); // Divider line
+			HBox bodyContainer = new HBox();
+
+			setMargin(seperatorTop, new Insets(-5, 0, 0, 0));
+			getChildren().addAll(headerContainer, seperatorTop, bodyContainer);
+			setSpacing(15);
+			setPadding(new Insets(20));
+
+			// ----- Header Container Setup
+			Label heading = new Label("Character Attributes");
+			heading.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+			Label subtitle = new Label("Distribute your attribute points; Hover over attribute for more details");
+
+			VBox headerColumn = new VBox(5, heading, subtitle);
+			headerColumn.setAlignment(Pos.CENTER_LEFT);
+
 			Button btnConfirm = new Button("Confirm");
+			Button btnBack = new Button("Back");
+
+			HBox headerRow = new HBox(20);
+			headerRow.setAlignment(Pos.CENTER_LEFT);
+			HBox.setMargin(btnConfirm, new Insets(35, 0, 0, 0));
+			HBox.setMargin(btnBack, new Insets(35, 0, 0, -10));
+
+			Region spacer = new Region(); // Makes space between labels and button
+			HBox.setHgrow(spacer, Priority.ALWAYS);
+
+			headerRow.getChildren().addAll(headerColumn, spacer, btnConfirm, btnBack);
+			headerContainer.getChildren().add(headerRow);
+			headerContainer.setAlignment(Pos.CENTER_LEFT);
 			
-			// HBoxes for individual abilities and their buttons
-			HBox hStrength = new HBox(leftStrength, tfStrength, rightStrength);
-			HBox hDexterity = new HBox(leftDexterity, tfDexterity, rightDexterity);
-			HBox hConstitution = new HBox(leftConstitution, tfConstitution, rightConstitution);
-			HBox hIntelligence = new HBox(leftIntelligence, tfIntelligence, rightIntelligence);
-			HBox hWisdom = new HBox(leftWisdom, tfWisdom, rightWisdom);
-			HBox hCharisma = new HBox(leftCharisma, tfCharisma, rightCharisma);
-			HBox buttons = new HBox(btnConfirm, btnBack);
+			availablePoints = (80 - character.getStrength() - character.getDexterity() - character.getConstitution() - character.getIntelligence() - character.getWisdom() - character.getCharisma());
+			lblPoints.setText((String.valueOf(availablePoints)));
+			setSpacing(10);
+			setPadding(new Insets(20));
 			
-			// getChildren()
-			getChildren().addAll(strength, hStrength, dexterity, hDexterity, constitution, hConstitution, 
-					intelligence, hIntelligence, wisdom, hWisdom, charisma, hCharisma, buttons);
+			// -------- Set attribute fields based on character sheet ----
+			tfStrength.setText(String.valueOf(character.getStrength()));
+			tfDexterity.setText(String.valueOf(character.getDexterity()));
+			tfConstitution.setText(String.valueOf(character.getConstitution()));
+			tfIntelligence.setText(String.valueOf(character.getIntelligence()));
+			tfWisdom.setText(String.valueOf(character.getWisdom()));
+			tfCharisma.setText(String.valueOf(character.getCharisma()));
 			
-			// Adjusts left and right buttons to any desired number within range(assuming there is a range)
-			leftStrength.setOnMouseClicked(e -> leftButtonCondition(tfStrength));
-			leftDexterity.setOnMouseClicked(e -> leftButtonCondition(tfDexterity));
-			leftConstitution.setOnMouseClicked(e -> leftButtonCondition(tfConstitution));
-			leftIntelligence.setOnMouseClicked(e -> leftButtonCondition(tfIntelligence));
-			leftWisdom.setOnMouseClicked(e -> leftButtonCondition(tfWisdom));
-			leftCharisma.setOnMouseClicked(e -> leftButtonCondition(tfCharisma));
+			// ----- Making left and right gridpanes to line up all labels buttons and text fields to be lined up in columns ------
+			GridPane leftGrid = new GridPane();
+			GridPane rightGrid = new GridPane();
 			
-			rightStrength.setOnMouseClicked(e -> rightButtonCondition(tfStrength));
-			rightDexterity.setOnMouseClicked(e -> rightButtonCondition(tfDexterity));
-			rightConstitution.setOnMouseClicked(e -> rightButtonCondition(tfConstitution));
-			rightIntelligence.setOnMouseClicked(e -> rightButtonCondition(tfIntelligence));
-			rightWisdom.setOnMouseClicked(e -> rightButtonCondition(tfWisdom));
-			rightCharisma.setOnMouseClicked(e -> rightButtonCondition(tfCharisma));
+			leftGrid.setHgap(10);
+			leftGrid.setVgap(15);
+			
+			rightGrid.setHgap(10);
+			rightGrid.setVgap(15);
+			
+			// ----- Split grid into two columns
+			createStatRow(leftGrid, 0, "STR: ", "STRENGTH - Physical power, imacts melee attacks, and carrying capacity.", tfStrength);
+			createStatRow(leftGrid, 1, "DEX: ", "DEXTERITY - Agility, reflexes, balance, and ranged accuracy", tfDexterity);
+			createStatRow(leftGrid, 2, "CON: ", "CONSTITUTION - Health, stamina, and resistance to damage or poison", tfConstitution);
+			
+			createStatRow(rightGrid, 0, "INT: ", "INTELLIGENCE - Reasoning, memory, and arcane power", tfIntelligence);
+			createStatRow(rightGrid, 1, "WIS: ", "WISDOM - Perception, intuition, willpower, and divine magic", tfWisdom);
+			createStatRow(rightGrid, 2, "CHA: ", "CHARISMA - Force of personality, persuasion, and leadership", tfCharisma);
+			
+			// ---------- add items to bodyContainer
+			
+			// HBox for gridpanes
+			HBox statContainer = new HBox(30);
+			statContainer.setAlignment(Pos.CENTER);
+			statContainer.setPadding(new Insets(35, 0, 0, 0));
+			statContainer.getChildren().addAll(leftGrid, rightGrid);
+			
+			//VBox for lblPool and lblPoints
+			VBox pointsContainer = new VBox(lblPool, lblPoints);
+			pointsContainer.setAlignment(Pos.CENTER);
+			
+			lblPool.setStyle("-fx-font-size: 14px;");
+			lblPoints.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+			pointsContainer.setPadding(new Insets(15, 25, 15, 25));
+			pointsContainer.setMinWidth(160);
+			pointsContainer.setStyle("-fx-border-color: #c8c8c8; -fx-border-radius: 8; -fx-background-color: white; -fx-background-radius: 8;");
+			
+			bodyContainer.setSpacing(40);
+			bodyContainer.setAlignment(Pos.CENTER);
+			bodyContainer.getChildren().addAll(pointsContainer, statContainer);
+			
+			VBox.setVgrow(statContainer, Priority.ALWAYS);
+			VBox.setVgrow(bodyContainer, Priority.ALWAYS);
 			
 			btnConfirm.setOnMouseClicked(e -> { // -> CharacterSheet
 				saveAbilities(character);
@@ -439,14 +501,47 @@ public class PAssign08b extends Application {
 				showScene(new CharacterRaceScene(stage, character), 3);
 			});
 			
-			// sets text to previous inputs when user returns to this scene
-			tfStrength.setText(String.valueOf(character.getStrength()));
-			tfDexterity.setText(String.valueOf(character.getDexterity()));
-			tfConstitution.setText(String.valueOf(character.getConstitution()));
-			tfIntelligence.setText(String.valueOf(character.getIntelligence()));
-			tfWisdom.setText(String.valueOf(character.getWisdom()));
-			tfCharisma.setText(String.valueOf(character.getCharisma()));
-			
+		}
+		
+		private void createStatRow(GridPane grid, int rowIndex, String labelText, String hoverText, TextField tf) {
+			Label lblStat = new Label(labelText);
+			lblStat.setPickOnBounds(true);
+
+			// ------- hover popup when mousing over stat label
+			Tooltip tooltip = new Tooltip(hoverText);
+			tooltip.setShowDelay(Duration.millis(50));
+			tooltip.install(lblStat, tooltip);
+
+			tf.setEditable(false);
+			tf.setPrefWidth(50);
+
+			Button btnLeft = new Button("◄");
+			Button btnRight = new Button("►");
+
+			btnLeft.setOnMouseClicked(e -> modifyStat(tf, -1));
+			btnRight.setOnMouseClicked(e -> modifyStat(tf, 1));
+
+			grid.add(lblStat, 0, rowIndex);
+			grid.add(btnLeft, 1, rowIndex);
+			grid.add(tf, 2, rowIndex);
+			grid.add(btnRight, 3, rowIndex);
+		}
+		
+		public void modifyStat(TextField textField, int delta) {
+			int currentVal = Integer.parseInt(textField.getText());
+			int newVal = currentVal + delta;
+
+			if (newVal >= 6 && newVal <= 18) {
+				if (delta > 0 && availablePoints > 0) {
+					textField.setText(String.valueOf(newVal));
+					availablePoints--;
+					lblPoints.setText((String.valueOf(availablePoints)));
+				} else if (delta < 0) {
+					textField.setText(String.valueOf(newVal));
+					availablePoints++;
+					lblPoints.setText((String.valueOf(availablePoints)));
+				}
+			}
 		}
 		
 		// method that saves the ability inputs and stores them into character data fields
@@ -482,26 +577,131 @@ public class PAssign08b extends Application {
 	// CharacterSheet class that will show all of the collected data for the user to view
 	class CharacterSheet extends VBox {
 		public CharacterSheet(Stage stage, Character character) {
-			// Labels for all updated information goes on sheet, and back and save buttons
-			Label playerName = new Label("Player Name: " + character.getPlayerName());
-			Label characterName = new Label("CharacterName: " + character.getCharacterName());
-			Label classType = new Label("Class: " + character.getCharClass());
-			Label raceType = new Label("Race: " + character.getCharRace());
-			Label strength = new Label("Strength: " + character.getStrength());
-			Label dexterity = new Label("Dexterity: " + character.getDexterity());
-			Label constitution = new Label("Constitution: " + character.getConstitution());
-			Label intelligence = new Label("Intelligence: " + character.getIntelligence());
-			Label wisdom = new Label("Wisdom: " + character.getWisdom());
-			Label charisma = new Label("Charisma: " + character.getCharisma());
-			
+			// ---- All containers in order to go in VBox
+			VBox headerContainer = new VBox();
+			Separator seperatorTop = new Separator(); // Divider line
+			HBox bodyContainer = new HBox();
+
+			setMargin(seperatorTop, new Insets(-5, 0, 0, 0));
+			getChildren().addAll(headerContainer, seperatorTop, bodyContainer);
+			setSpacing(15);
+			setPadding(new Insets(20));
+
+			// ----- Header Container Setup
+			Label heading = new Label("Character Review");
+			heading.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+			Label subtitle = new Label("Review your character before saving.");
+
+			VBox headerColumn = new VBox(5, heading, subtitle);
+			headerColumn.setAlignment(Pos.CENTER_LEFT);
+
 			Button btnSave = new Button("Save");
 			Button btnBack = new Button("Back");
+
+			HBox headerRow = new HBox(20);
+			headerRow.setAlignment(Pos.CENTER_LEFT);
+			HBox.setMargin(btnSave, new Insets(35, 0, 0, 0));
+			HBox.setMargin(btnBack, new Insets(35, 0, 0, -10));
+
+			Region spacer = new Region(); // Makes space between labels and button
+			HBox.setHgrow(spacer, Priority.ALWAYS);
+
+			headerRow.getChildren().addAll(headerColumn, spacer, btnSave, btnBack);
+			headerContainer.getChildren().add(headerRow);
+			headerContainer.setAlignment(Pos.CENTER_LEFT);
+						
+			// Labels for all updated information goes on sheet, and back and save buttons
+			Label playerName = new Label("Player Name");
+			Label playerInput = new Label(String.valueOf(character.getPlayerName()));
+
+			Label characterName = new Label("Character Name");
+			Label characterInput = new Label(String.valueOf(character.getCharacterName()));
+
+			Label classType = new Label("Class");
+			Label classInput = new Label(String.valueOf(character.getCharClass()));
+
+			Label raceType = new Label("Race");
+			Label raceInput = new Label(String.valueOf(character.getCharRace()));
+
+			Label strength = new Label("Strength");
+			Label strengthInput = new Label(String.valueOf(character.getStrength()));
+
+			Label dexterity = new Label("Dexterity");
+			Label dexterityInput = new Label(String.valueOf(character.getDexterity()));
+
+			Label constitution = new Label("Constitution");
+			Label constitutionInput = new Label(String.valueOf(character.getConstitution()));
+
+			Label intelligence = new Label("Intelligence");
+			Label intelligenceInput = new Label(String.valueOf(character.getIntelligence()));
+
+			Label wisdom = new Label("Wisdom");
+			Label wisdomInput = new Label(String.valueOf(character.getWisdom()));
+
+			Label charisma = new Label("Charisma");
+			Label charismaInput = new Label(String.valueOf(character.getCharisma()));
 			
-			// HBox for save and confirm button
-			HBox hbox = new HBox(btnBack, btnSave);
+			Label charInfoHeader = new Label("Character Info");
+			Label attributesHeader = new Label("Attributes");
 			
-			// getChildren
-			getChildren().addAll(playerName, characterName, classType, raceType, strength, dexterity, constitution, intelligence, wisdom, charisma, hbox);
+			Label[] labels = {
+				    playerName,
+				    characterName,
+				    classType,
+				    raceType,
+				    strength,
+				    dexterity,
+				    constitution,
+				    intelligence,
+				    wisdom,
+				    charisma, 
+				    charInfoHeader,
+				    attributesHeader
+				};
+
+				
+			for (Label label : labels) {
+			    label.setStyle("-fx-font-weight: bold;");
+			}
+			
+			// GridPane for attributes
+			GridPane grid = new GridPane();
+			grid.setHgap(10);
+			grid.add(strength, 0, 0);
+			grid.add(strengthInput, 1, 0);
+			grid.add(dexterity, 0, 1);
+			grid.add(dexterityInput, 1, 1);
+			grid.add(constitution, 0, 2);
+			grid.add(constitutionInput, 1, 2);
+			grid.add(intelligence, 0, 3);
+			grid.add(intelligenceInput, 1, 3);
+			grid.add(wisdom, 0, 4);
+			grid.add(wisdomInput, 1, 4);
+			grid.add(charisma, 0, 5);
+			grid.add(charismaInput, 1, 5);
+			
+			// Divider for left VBox
+			Separator divideChar = new Separator();
+			
+			// Divider for right VBox
+			Separator divideAttrib = new Separator();
+			
+			// VBox for character info
+			VBox charInfoContainer = new VBox();
+			charInfoContainer.setAlignment(Pos.CENTER);
+			charInfoContainer.getChildren().addAll(charInfoHeader, divideChar, playerName, playerInput, characterName,
+					characterInput, classType, classInput, raceType, raceInput);
+			
+			// VBox for attributes
+			VBox attributesContainer = new VBox();
+			attributesContainer.setAlignment(Pos.CENTER);
+			attributesContainer.getChildren().addAll(attributesHeader, divideAttrib, grid);
+			
+			bodyContainer.setSpacing(60);
+			bodyContainer.setAlignment(Pos.TOP_CENTER);
+			bodyContainer.setPadding(new Insets(2, 0, 0, 0));
+			VBox.setVgrow(bodyContainer, Priority.ALWAYS);
+			bodyContainer.getChildren().addAll(charInfoContainer, attributesContainer);
 			
 			// see print() method
 			btnSave.setOnMouseClicked(e -> {
@@ -549,6 +749,12 @@ public class PAssign08b extends Application {
 		Character() {
 			setPlayerName("");
 			setCharacterName("");
+			setStrength(10);
+			setDexterity(10);
+			setConstitution(10);
+			setIntelligence(10);
+			setWisdom(10);
+			setCharisma(10);
 		}
 		
 		public String getPlayerName() {
