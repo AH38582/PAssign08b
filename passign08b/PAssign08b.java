@@ -2,12 +2,9 @@ package passign08b;
 
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
-
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -42,7 +39,7 @@ import javafx.geometry.Pos;
  * - Running window opens with the first scene, which is a class. Each ___Scene class has a confirm button that projects the next scene 
  * - "Character" class holds all the information the user will input into each scene 
  * - "CharacterRace" and "CharacterClass" classes are abstract for its subclasses and serves as setting a subclass for the "Character" class 
- * - subclasses that extend "CharacterRace" and "CharacterClass" are place-holders visually for now and can be modified
+ * - subclasses that extend "CharacterRace" and "CharacterClass" 
  */
 
 public class PAssign08b extends Application {
@@ -63,14 +60,14 @@ public class PAssign08b extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		// Create Character
+		// ----- Create Character object
 		Character character = new Character();
 
-		// Create CharacterNameScene
+		// ----- Create CharacterNameScene object
 		CharacterNameScene characterScene = new CharacterNameScene(stage, character);
 
-		// Set first scene here and CharacterScene class will hold action event for next scene
-		Scene scene = new Scene(root, 780, 380);
+		// ----- Set first scene here and CharacterScene class will hold action event for next scene
+		Scene scene = new Scene(root, 800, 380);
 		showScene(new CharacterNameScene(stage, character), 1);
 		
 		// prioritizes focus to be on entire node (to prevent cursor from automatically setting into text field)
@@ -78,10 +75,9 @@ public class PAssign08b extends Application {
 		characterScene.requestFocus();
 		stage.setScene(scene);
 		stage.show();
-
 	}
 
-	// CharacterNameScene class that customizes scene and will project next scene when user presses "Confirm" button
+	// ----- CharacterNameScene class that customizes scene and will project next scene when user presses "Confirm" button
 	class CharacterNameScene extends VBox {
 
 		public CharacterNameScene(Stage stage, Character character) {
@@ -91,6 +87,9 @@ public class PAssign08b extends Application {
 			GridPane gridBox = new GridPane();
 			
 			setMargin(seperatorTop, new Insets(-10, 0, 0, 0));
+			setSpacing(15);
+			setPadding(new Insets(30));
+			setAlignment(Pos.CENTER);
 			
 			getChildren().addAll(headingBox, seperatorTop, gridBox);
 			
@@ -126,7 +125,7 @@ public class PAssign08b extends Application {
 			playerError.setStyle("-fx-text-fill: #eb4034;");
 			VBox playerVbox = new VBox(tfPlayerName, playerError);
 			
-			// ---------- set input and UI for Character Name ------
+			// ---------- Set input and UI for Character Name ------
 			Label lblCharacterName = new Label("Character Name: ");
 			TextField tfCharacterName = new TextField(character.getCharacterName());
 			tfCharacterName.setPromptText("Enter Character Name...");
@@ -143,17 +142,12 @@ public class PAssign08b extends Application {
 			GridPane.setMargin(playerVbox, new Insets(22, 0, 0, 0));
 			GridPane.setMargin(characterVbox, new Insets(22, 0, 0, 0));
 			
-			//------ put spacing between items
-			setSpacing(15);
-			setPadding(new Insets(30));
-			setAlignment(Pos.CENTER);
-			
 			btnConfirm.setOnAction(e -> { // -> CharacterClassScene
-				// -------- clear the errors before checking
+				// ----- Clear the errors before checking
 				characterError.setText("");
 				playerError.setText("");
 
-				// takes trimmed input and store in variable
+				// --- Takes trimmed input and store in variable
 				String pName = tfPlayerName.getText().trim();
 				String charName = tfCharacterName.getText().trim();
 
@@ -189,7 +183,7 @@ public class PAssign08b extends Application {
 
 	}
 
-	// CharacterClassScene class that customizes scene and will project next scene when user presses "Confirm" button
+	// ----- CharacterClassScene class that customizes scene and will project next scene when user presses "Confirm" button
 	class CharacterClassScene extends VBox {
 		public CharacterClassScene(Stage stage, Character character) {
 			// ---- All containers in order to go in VBox
@@ -294,11 +288,11 @@ public class PAssign08b extends Application {
 					lblDescription.setText(cleric.getClassDescription());
 				}
 			}
-			
+
 		}
 	}
 
-	// CharacterRaceScene class that customizes scene and will project next scene when user presses "Confirm" button
+	// ----- CharacterRaceScene class that customizes scene and will project next scene when user presses "Confirm" button
 	class CharacterRaceScene extends VBox {
 		public CharacterRaceScene(Stage stage, Character character) {
 			// ---- All containers in order to go in VBox
@@ -334,14 +328,14 @@ public class PAssign08b extends Application {
 			headerContainer.getChildren().add(headerRow);
 			headerContainer.setAlignment(Pos.CENTER_LEFT);
 			
-			// All available CharacterRace subclasses
+			// ----- All available CharacterRace subclasses
 			RaceHuman human = new RaceHuman();
 			RaceElf elf = new RaceElf();
 			RaceDwarf dwarf = new RaceDwarf();
 			RaceHalfElf halfElf = new RaceHalfElf();
 			RaceHalfOrc halfOrc = new RaceHalfOrc();
 
-			// combo-box
+			// ----- Combo-box
 			ComboBox<CharacterRace> cbRace = new ComboBox<CharacterRace>();
 			cbRace.getItems().addAll(human, elf, dwarf, halfElf, halfOrc);
 			cbRace.setPromptText("Choose a race: ");
@@ -353,7 +347,7 @@ public class PAssign08b extends Application {
 			lblDescription.setWrapText(true);
 			lblDescription.setStyle("-fx-font-style: italic; -fx-padding: 5px");
 			
-			// ------ update the race description with what is selected from comboBox
+			// ------ Update the race description with what is selected from comboBox
 			
 			cbRace.setOnAction(e -> {
 				CharacterRace selected = cbRace.getValue();
@@ -384,7 +378,7 @@ public class PAssign08b extends Application {
 				}
 			});
 			
-			// back button that goes back to previous scene
+			// ----- Back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
 				showScene(new CharacterClassScene(stage, character), 2);
 			});
@@ -393,14 +387,13 @@ public class PAssign08b extends Application {
 
 	}
 
-	// CharacterAbilityScene class that customizes scene and will project next scene when user presses "Confirm" button
+	// ----- CharacterAbilityScene class that customizes scene and will project next scene when user presses "Confirm" button
 	class CharacterAbilityScene extends VBox {
-		
+		// ----- Private data fields 
 		private int availablePoints;
 		private Label lblPool = new Label("Available Attribute Points");
 		private Label lblPoints = new Label(String.valueOf(availablePoints));
 		
-		// Private data fields that set initial text fields to "0" and arrow buttons
 		private TextField tfStrength = new TextField();
 		private TextField tfDexterity = new TextField();
 		private TextField tfConstitution = new TextField();
@@ -409,7 +402,6 @@ public class PAssign08b extends Application {
 		private TextField tfCharisma = new TextField();
 		
 		public CharacterAbilityScene(Stage stage, Character character) {
-			
 			// ---- All containers in order to go in VBox
 			VBox headerContainer = new VBox();
 			Separator seperatorTop = new Separator(); // Divider line
@@ -477,13 +469,13 @@ public class PAssign08b extends Application {
 			
 			// ---------- add items to bodyContainer
 			
-			// HBox for gridpanes
+			// ----- HBox for gridpanes
 			HBox statContainer = new HBox(30);
 			statContainer.setAlignment(Pos.CENTER);
 			statContainer.setPadding(new Insets(50, 0, 0, 0));
 			statContainer.getChildren().addAll(leftGrid, rightGrid);
 			
-			//VBox for lblPool and lblPoints
+			// ----- VBox for lblPool and lblPoints
 			VBox pointsContainer = new VBox(lblPool, lblPoints);
 			pointsContainer.setAlignment(Pos.CENTER);
 			
@@ -505,13 +497,14 @@ public class PAssign08b extends Application {
 				showScene(new CharacterSheet(stage, character), 5);
 			});
 			
-			// back button that goes back to previous scene
+			// ----- Back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
 				showScene(new CharacterRaceScene(stage, character), 3);
 			});
 			
 		}
 		
+		// ----- Method that generates a gridpane row holding multiple nodes
 		private void createStatRow(GridPane grid, int rowIndex, String labelText, String hoverText, TextField tf) {
 			Label lblStat = new Label(labelText);
 			lblStat.setPickOnBounds(true);
@@ -536,6 +529,7 @@ public class PAssign08b extends Application {
 			grid.add(btnRight, 3, rowIndex);
 		}
 		
+		// ----- Method that modifies stats upon clicking the arrow buttons
 		public void modifyStat(TextField textField, int delta) {
 			int currentVal = Integer.parseInt(textField.getText());
 			int newVal = currentVal + delta;
@@ -553,7 +547,7 @@ public class PAssign08b extends Application {
 			}
 		}
 		
-		// method that saves the ability inputs and stores them into character data fields
+		// ----- Method that saves the ability inputs and stores them into character data fields
 		public void saveAbilities(Character character) {
 			character.setStrength(Integer.parseInt(tfStrength.getText()));
 			character.setDexterity(Integer.parseInt(tfDexterity.getText()));
@@ -564,26 +558,9 @@ public class PAssign08b extends Application {
 			character.getCharRace().applyStats(character);
 		}
 		
-		// method that conditions the floor for left button (assuming there is a floor)
-		public void leftButtonCondition(TextField textField) {
-			int num = Integer.parseInt(textField.getText());
-			
-			if (num > 0) {
-				textField.setText(String.format("%d", num - 1));
-			} 
-		}
-		
-		// method that conditions the ceiling for right button (assuming there is a ceiling)
-		public void rightButtonCondition(TextField textField) {
-			int num = Integer.parseInt(textField.getText());
-
-			if (num < 20) {
-				textField.setText(String.format("%d", num + 1));
-			}
-		}
 	}
 
-	// CharacterSheet class that will show all of the collected data for the user to view
+	// ----- CharacterSheet class that will show all of the collected data for the user to view
 	class CharacterSheet extends VBox {
 		public CharacterSheet(Stage stage, Character character) {
 			// ---- All containers in order to go in VBox
@@ -619,7 +596,7 @@ public class PAssign08b extends Application {
 			headerContainer.getChildren().add(headerRow);
 			headerContainer.setAlignment(Pos.CENTER_LEFT);
 						
-			// Labels for all updated information goes on sheet, and back and save buttons
+			// ----- Labels for all updated information goes on sheet, and back and save buttons
 			Label playerName = new Label("Player Name");
 			Label playerInput = new Label(String.valueOf(character.getPlayerName()));
 
@@ -677,7 +654,7 @@ public class PAssign08b extends Application {
 			charInfoHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
 			attributesHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
 			
-			// GridPane for attributes
+			// ----- GridPane for attributes
 			GridPane grid = new GridPane();
 			grid.setHgap(20);
 			grid.setVgap(2);
@@ -694,7 +671,7 @@ public class PAssign08b extends Application {
 			grid.add(charisma, 0, 5);
 			grid.add(charismaInput, 1, 5);
 			
-			// Gridpane for char info
+			// ----- Gridpane for char info
 			GridPane infoGrid = new GridPane();
 			infoGrid.setHgap(20);
 			infoGrid.setVgap(6);
@@ -707,19 +684,19 @@ public class PAssign08b extends Application {
 			infoGrid.add(raceType, 0, 3);
 			infoGrid.add(raceInput, 1, 3);
 
-			// Divider for left VBox
+			// ----- Divider for left VBox
 			Separator divideChar = new Separator();
 			
-			// Divider for right VBox
+			// ----- Divider for right VBox
 			Separator divideAttrib = new Separator();
 			
-			// VBox for character info
+			// ----- VBox for character info
 			VBox charInfoContainer = new VBox(6);
 			charInfoContainer.setAlignment(Pos.TOP_CENTER);
 			charInfoContainer.setPrefWidth(300);
 			charInfoContainer.getChildren().addAll(charInfoHeader, divideChar, infoGrid);
 			
-			// VBox for attributes
+			// ----- VBox for attributes
 			VBox attributesContainer = new VBox(6);
 			attributesContainer.setAlignment(Pos.TOP_CENTER);
 			attributesContainer.setPrefWidth(200);
@@ -731,23 +708,22 @@ public class PAssign08b extends Application {
 			VBox.setVgrow(bodyContainer, Priority.ALWAYS);
 			bodyContainer.getChildren().addAll(charInfoContainer, attributesContainer);
 			
-			// see print() method
+			// ----- See save() method
 			btnSave.setOnMouseClicked(e -> {
 				save(this, stage);
 			});
 			
 			
-			// back button that goes back to previous scene
+			// ----- Back button that goes back to previous scene
 			btnBack.setOnMouseClicked(e -> {
 				showScene(new CharacterAbilityScene(stage, character), 4);
 			});
 			
 		}
 		
-		// method opens file explorer and allows user to save their character sheet
-		
+		// ----- Method opens file explorer and allows user to save their character sheet
 		public void save(Node node, Window ownerWindow) {
-			// simulates a interface for user to save their character sheet into file explorer
+			// ----- Simulates a interface for user to save their character sheet into file explorer
 			FileChooser chooser = new FileChooser();
 			chooser.setTitle("Save Character Sheet");
 			chooser.setInitialFileName("character_sheet.png");
@@ -756,10 +732,10 @@ public class PAssign08b extends Application {
 			
 			if (file != null) {
 				try {
-					// creates snapshot image of the node
+					// ----- Creates snapshot image of the node
 					WritableImage image = node.snapshot(new SnapshotParameters(), null);
 					
-					// converts image to buffered image and writes as a PNG
+					// ----- Converts image to buffered image and writes as a PNG
 					ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -767,12 +743,8 @@ public class PAssign08b extends Application {
 			}
 		}
 	}
-	
-	/**
-	 * lines 328 and down are to be modified later
-	 */
 
-	// Character class that stores character information
+	// ----- Character class that stores character information
 	class Character {
 		private String playerName;
 		private String characterName;
@@ -785,6 +757,7 @@ public class PAssign08b extends Application {
 		private int wisdom;
 		private int charisma;
 		
+		// ----- Default constructor that sets each attribut field to 10 and String values with empty string
 		Character() {
 			setPlayerName("");
 			setCharacterName("");
@@ -795,6 +768,8 @@ public class PAssign08b extends Application {
 			setWisdom(10);
 			setCharisma(10);
 		}
+		
+		// ----- Getters and setters
 		
 		public String getPlayerName() {
 			return playerName;
@@ -878,6 +853,7 @@ public class PAssign08b extends Application {
 
 	}
 	
+	// ----- Tracker class that keeps progress of where the user is at in the GUI
 	class CharacterCreationTracker extends HBox {
 		private String[] pages = { "Name", "Class", "Race", "Abilities", "Review" };
 		
@@ -919,7 +895,7 @@ public class PAssign08b extends Application {
 		}
 	}
 
-	// CharacterClass class that the Character class can use to set a class object
+	// ----- CharacterClass class that the Character class can use to set a class object
 	abstract class CharacterClass {
 		private String className;
 
@@ -942,7 +918,7 @@ public class PAssign08b extends Application {
 
 	}
 
-	// placeholder subclasses of CharacterClass that will specify particular stats
+	// ----- Fighter subclass of CharacterClass that will specify description and name
 	class Fighter extends CharacterClass {
 		private String classDescription = "Fighters are trained warriors who rely on skill, strength, and weapons rather than magic to win battles. They can use almost any weapon or armor, making them versatile frontline soldiers who can both take heavy hits and dish out fast, deadly attacks.";
 		
@@ -955,6 +931,7 @@ public class PAssign08b extends Application {
 		}
 	}
 	
+	// ----- Mage subclass of CharacterClass that will specify description and name
 	class Mage extends CharacterClass {
 		private String classDescription = "Mages are scholars and spellcasters who study the arcane arts to bend reality to their will. Though physically fragile and unable to wear heavy armor, they stay in the backlines to unleash devastating elemental magic, summon creatures, and control the battlefield with powerful spells.";
 		
@@ -967,6 +944,7 @@ public class PAssign08b extends Application {
 		}
 	}
 	
+	// ----- Cleric subclass of CharacterClass that will specify description and name
 	class Cleric extends CharacterClass{
 		
 		private String classDescription =  "Clerics are devout warriors who channel divine magic granted by the gods they serve. Wearing medium or heavy armor, they stand near the frontlines to heal wounded allies, banish undead monsters, and smite enemies with sacred power.";
@@ -980,8 +958,7 @@ public class PAssign08b extends Application {
 		}
 	}
 	
-	
-	// CharacterRace class that the Character class can use to set a race object
+	// ----- CharacterRace class that the Character class can use to set a race object
 	abstract class CharacterRace {
 		private String raceName;
 		private String raceDescription;
@@ -1014,7 +991,7 @@ public class PAssign08b extends Application {
 		}
 	}
 
-	// placeholder subclasses of CharacterRace that will specify particular stats
+	// ----- Human subclass of CharacterRace that will specify particular stats, description and name
 	class RaceHuman extends CharacterRace {
 		RaceHuman() {
 			super("Human");
@@ -1029,6 +1006,7 @@ public class PAssign08b extends Application {
 		}
 	}
 
+	// ----- Elf subclass of CharacterRace that will specify particular stats, description and name
 	class RaceElf extends CharacterRace { // placeholder subclass with fixed ability score increase
 		RaceElf() {
 			super("Elf");
@@ -1042,6 +1020,7 @@ public class PAssign08b extends Application {
 		}
 	}
 	
+	// ----- Dwarf subclass of CharacterRace that will specify particular stats, description and name
 	class RaceDwarf extends CharacterRace {
 		RaceDwarf() {
 			super("Dwarf");
@@ -1056,6 +1035,7 @@ public class PAssign08b extends Application {
 		}
 	}
 	
+	// ----- HalfElf subclass of CharacterRace that will specify particular stats, description and name
 	class RaceHalfElf extends CharacterRace {
 		RaceHalfElf() {
 			super("Half-Elf");
@@ -1069,6 +1049,7 @@ public class PAssign08b extends Application {
 		}
 	}
 	
+	// ----- HalfOrc subclass of CharacterRace that will specify particular stats, description and name
 	class RaceHalfOrc extends CharacterRace {
 		RaceHalfOrc() {
 			super("Half-Orc");
