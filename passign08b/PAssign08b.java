@@ -1,3 +1,12 @@
+/**
+ * File: PAssign08b.java
+ * Class: CSCI 1302
+ * Author: Adam Bojoh and Asia Hayden
+ * Created on: Nov 13, 2026
+ * Last Modified: Nov 20, 2026
+ * Description: A character sheet creator partner project
+ */
+
 package passign08b;
 
 import java.io.File;
@@ -73,6 +82,7 @@ public class PAssign08b extends Application {
 		// prioritizes focus to be on entire node (to prevent cursor from automatically setting into text field)
 		characterScene.setFocusTraversable(true);
 		characterScene.requestFocus();
+		stage.setTitle("Character Builder"); 
 		stage.setScene(scene);
 		stage.show();
 	}
